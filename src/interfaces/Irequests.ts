@@ -1,3 +1,4 @@
+import { MetodosPago } from './../enums/EtablesDB';
 import { IObjectFiles } from "./Ifunctions";
 
 export interface INewUser {
@@ -80,13 +81,21 @@ export interface INewFactura {
     cond_iva: number,
     forma_pago: number,
     enviar_email: boolean,
+    descuentoPerc: number,
     lista_prod: Array<{
         id_prod: number,
-        cant_prod: number
+        cant_prod: number,
+
     }>,
     cliente_bool: boolean,
     cliente_tdoc?: number,
     cliente_ndoc?: number,
     cliente_email?: string,
-    cliente_name?: string
+    cliente_name?: string,
+    det_rbo?: string,
+    variosPagos?: Array<{
+        tipo: MetodosPago,
+        tipo_txt: string,
+        importe: number
+    }>
 }

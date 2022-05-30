@@ -76,8 +76,8 @@ export = (injectedStore: typeof StoreType) => {
             cant: body.nvoStockSingle,
             venta: false,
             nro_remito: body.obs,
-            costo: (body.costo) * (body.nvoStockSingle),
-            iva: body.iva,
+            costo: (prodData[0].precio_compra) * (body.nvoStockSingle),
+            iva: prodData[0].iva,
             id_user: user.id,
             prod_name: prodData[0].name,
             pv_descr: `${body.pv_id === 0 ? "Deposito" : pvData[0].direccion + ` (PV: ${pvData[0].pv})`}`,
@@ -96,8 +96,8 @@ export = (injectedStore: typeof StoreType) => {
             };
             await store.update(Tables.PRODUCTS_PRINCIPAL, NewPriceProd, body.idProd);
         }
-
-        return await store.insert(Tables.STOCK, newMov);
+        const response = await store.insert(Tables.STOCK, newMov);
+        return response
     }
 
     const multipleInsertStock = async (prodList: Array<IDetFactura>, userId: number, pvId: number, factId: number) => {
@@ -286,8 +286,8 @@ export = (injectedStore: typeof StoreType) => {
             pages = {
                 currentPage: page,
                 cantPerPage: cantPerPage || 10,
-                order: Columns.prodImg.id_prod,
-                asc: true
+                order: Columns.stock.fecha,
+                asc: false
             };
             data = await store.list(Tables.STOCK, [ESelectFunct.all], filters, undefined, pages);
             const cant = await store.list(Tables.STOCK, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters);
@@ -358,6 +358,7 @@ export = (injectedStore: typeof StoreType) => {
         }
 
         let groupBy: Array<string> = [Columns.stock.id_prod];
+
         if (group === 1) {
             groupBy = [Columns.stock.sub_category];
         } else if (group === 2) {
@@ -399,13 +400,31 @@ export = (injectedStore: typeof StoreType) => {
             };
             data = await store.list(Tables.STOCK, [ESelectFunct.all, `SUM(${Columns.stock.cant}) as total`, `SUM(${Columns.stock.costo}) as costoTotal`], filters, groupBy, pages, undefined, orden);
             const cant = await store.list(Tables.STOCK, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters, groupBy);
-            const pagesObj = await getPages(cant[0].COUNT, 10, Number(page));
+            const pagesObj = await getPages(cant.length, 10, Number(page));
             return {
                 data,
                 pagesObj
             };
         } else {
             return await store.list(Tables.STOCK, [ESelectFunct.all], filters);
+        }
+    }
+
+    const getStockProd = async (idProd: number, pvId: number) => {
+        let filters: Array<IWhereParams> = [];
+        const filter: IWhereParams = {
+            mode: EModeWhere.strict,
+            concat: EConcatWhere.and,
+            items: [
+                { column: Columns.stock.pv_id, object: String(pvId < 0 ? 0 : pvId) }, { column: Columns.stock.id_prod, object: String(idProd) }
+            ]
+        };
+        filters.push(filter)
+        const response = await store.list(Tables.STOCK, [`SUM(${Columns.stock.cant}) as cant`], filters);
+        try {
+            return response[0].cant
+        } catch (error) {
+            return 0
         }
     }
 
@@ -418,6 +437,7 @@ export = (injectedStore: typeof StoreType) => {
         moverStock,
         multipleInsertStock,
         ultStockList,
-        listaStock
+        listaStock,
+        getStockProd
     }
 }

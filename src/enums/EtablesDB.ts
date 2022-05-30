@@ -146,7 +146,9 @@ enum Facturas {
     total_compra = "total_compra",
     forma_pago = "forma_pago",
     pv_id = "pv_id",
-    id_fact_asoc = "id_fact_asoc"
+    id_fact_asoc = "id_fact_asoc",
+    create_time = "create_time",
+    det_rbo = "det_rbo"
 }
 
 enum DetalleFact {
@@ -165,6 +167,34 @@ enum DetalleFact {
     precio_ind = "precio_ind"
 }
 
+enum CtaCte {
+    id = "id",
+    fecha = "fecha",
+    id_cliente = "id_cliente",
+    id_factura = "id_factura",
+    id_recibo = "id_recibo",
+    forma_pago = "forma_pago",
+    importe = "importe",
+    detalle = "detalle"
+}
+
+enum FormasPago {
+    id = "id",
+    id_fact = "id_fact",
+    tipo = "tipo",
+    importe = "importe"
+}
+
+export enum MetodosPago {
+    efectivo = 0,
+    mercaPago = 1,
+    debito = 2,
+    credito = 3,
+    ctaCte = 4,
+    varios = 5
+
+}
+
 export enum Tables {
     ADMIN = "administradores",
     AUTH_ADMIN = "auth_admin",
@@ -178,7 +208,9 @@ export enum Tables {
     PERMISSIONS = "permissions",
     STOCK = "stock",
     FACTURAS = "facturas",
-    DET_FACTURAS = "detalle_fact"
+    DET_FACTURAS = "detalle_fact",
+    CTA_CTE = "cta_cte",
+    FORMAS_PAGO = "formas_pago"
 }
 
 export const Columns = {
@@ -194,5 +226,7 @@ export const Columns = {
     permissions: Permissions,
     stock: Stock,
     facturas: Facturas,
-    detallesFact: DetalleFact
+    detallesFact: DetalleFact,
+    ctaCte: CtaCte,
+    formasPago: FormasPago
 }
