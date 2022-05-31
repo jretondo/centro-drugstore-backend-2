@@ -1,7 +1,7 @@
 import { ETypesJoin } from '../../../enums/EfunctMysql';
 import { MetodosPago } from './../../../enums/EtablesDB';
 import { sendAvisoFact } from './../../../utils/sendEmails/sendAvisoFact';
-import { IFormasPago, IMovCtaCte } from './../../../interfaces/Itables';
+import { IFormasPago, IImgProd, IMovCtaCte } from './../../../interfaces/Itables';
 import { createListSellsPDF } from './../../../utils/facturacion/lists/createListSellsPDF';
 import { EConcatWhere, EModeWhere, ESelectFunct } from '../../../enums/EfunctMysql';
 import { Tables, Columns } from '../../../enums/EtablesDB';
@@ -14,7 +14,7 @@ import {
 import ptosVtaController from '../ptosVta';
 import { Ipages, IWhereParams, IJoin } from 'interfaces/Ifunctions';
 import { IClientes, IDetFactura, IFactura, IUser } from 'interfaces/Itables';
-import { INewPV } from 'interfaces/Irequests';
+import { INewProduct, INewPV } from 'interfaces/Irequests';
 import ControllerStock from '../stock';
 import ControllerClientes from '../clientes';
 import fs from 'fs';
@@ -509,6 +509,22 @@ export = (injectedStore: typeof StoreType) => {
         }
     }
 
+    const correctorImg = async () => {
+        const productos: Array<INewProduct> = await store.list(Tables.PRODUCTS_PRINCIPAL, ["*"])
+        return new Promise((resolve, reject) => {
+            productos.map(async (item, key) => {
+                const dataImg: IImgProd = {
+                    id_prod: Number(item.id),
+                    url_img: "product.png"
+                }
+                await store.insert(Tables.PRODUCTS_IMG, dataImg)
+                if (productos.length - 1 === key) {
+                    resolve(productos)
+                }
+            })
+        })
+    }
+
     return {
         lastInvoice,
         list,
@@ -523,6 +539,7 @@ export = (injectedStore: typeof StoreType) => {
         dummyServers,
         correctorNC,
         newMovCtaCte,
-        getFormasPago
+        getFormasPago,
+        correctorImg
     }
 }
