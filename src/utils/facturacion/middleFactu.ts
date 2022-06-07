@@ -115,7 +115,9 @@ const factuMiddel = () => {
                 forma_pago: body.forma_pago,
                 pv_id: body.pv_id,
                 id_fact_asoc: 0,
-                descuento: descuentoNumber
+                descuento: descuentoNumber,
+                det_rbo: body.det_rbo,
+                custom_bool: body.custom_bool
             }
 
             let ivaList: Array<IIvaItem> = [];

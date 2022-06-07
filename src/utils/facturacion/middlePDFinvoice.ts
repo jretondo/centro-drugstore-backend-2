@@ -203,6 +203,8 @@ export const invoicePDFMiddle = () => {
                 cbteAsoc,
                 formaPago,
                 variosPagos,
+                customDetBool: newFact.custom_bool,
+                detalle: newFact.det_rbo,
                 ...encabezado,
                 ...ptoVta,
                 ...cliente,

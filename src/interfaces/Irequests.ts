@@ -82,6 +82,7 @@ export interface INewFactura {
     forma_pago: number,
     enviar_email: boolean,
     descuentoPerc: number,
+    custom_bool: boolean
     lista_prod: Array<{
         id_prod: number,
         cant_prod: number,
@@ -92,7 +93,7 @@ export interface INewFactura {
     cliente_ndoc?: number,
     cliente_email?: string,
     cliente_name?: string,
-    det_rbo?: string,
+    det_rbo: string,
     variosPagos?: Array<{
         tipo: MetodosPago,
         tipo_txt: string,

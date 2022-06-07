@@ -73,7 +73,8 @@ const paymentMiddle = () => {
                 pv_id: pvId,
                 id_fact_asoc: 0,
                 descuento: 0,
-                det_rbo: detalle
+                det_rbo: detalle,
+                custom_bool: true
             }
 
             req.body.newFact = newFact

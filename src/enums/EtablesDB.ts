@@ -148,7 +148,8 @@ enum Facturas {
     pv_id = "pv_id",
     id_fact_asoc = "id_fact_asoc",
     create_time = "create_time",
-    det_rbo = "det_rbo"
+    det_rbo = "det_rbo",
+    custom_bool = "custom_bool"
 }
 
 enum DetalleFact {

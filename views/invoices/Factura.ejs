@@ -108,26 +108,45 @@
                               <% } %>
               </div>
       </div>
-
-      <table border="0" cellspacing="0" cellpadding="0">
-        <thead>
-          <tr>
-            <th class="no">CANT.</th>
-            <th class="desc">DESCRIPCION</th>
-            <th class="unit">% IVA</th>
-            <th class="qty">$ UN. C/IVA</th>
-            <th class="total">TOTAL</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% listaItems.forEach(function(item){ %>
-            <%- include('./ItemFact.ejs', {itemIva: item.alicuota_id, itemName: item.nombre_prod, itemPrice:
-              item.precio_ind, itemCant: item.cant_prod, itemTotal: item.total_prod, tipoUn: item.unidad_tipo_prod}); %>
-              <% }); %>
-        </tbody>
-        <tfoot>
-        </tfoot>
-      </table>
+      <% if(customDetBool){ %>
+        <table border="0" cellspacing="0" cellpadding="0">
+          <thead>
+            <tr>
+              <th class="desc">DESCRIPCION</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: left;">
+                <%- detalle %>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+          </tfoot>
+        </table>
+        <% }else{ %>
+          <table border="0" cellspacing="0" cellpadding="0">
+            <thead>
+              <tr>
+                <th class="no">CANT.</th>
+                <th class="desc">DESCRIPCION</th>
+                <th class="unit">% IVA</th>
+                <th class="qty">$ UN. C/IVA</th>
+                <th class="total">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% listaItems.forEach(function(item){ %>
+                <%- include('./ItemFact.ejs', {itemIva: item.alicuota_id, itemName: item.nombre_prod, itemPrice:
+                  item.precio_ind, itemCant: item.cant_prod, itemTotal: item.total_prod, tipoUn:
+                  item.unidad_tipo_prod}); %>
+                  <% }); %>
+            </tbody>
+            <tfoot>
+            </tfoot>
+          </table>
+          <% } %>
     </main>
     <footer>
       <table border="0" cellspacing="0" cellpadding="0">
