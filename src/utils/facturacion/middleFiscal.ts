@@ -46,11 +46,11 @@ export const fiscalMiddle = () => {
                 let keyDir = "drop.key"
                 let entornoAlt = false
 
-                if (process.env.ENTORNO === "PROD") {
-                    certDir = pvData.cert_file || "drop_test.crt"
-                    keyDir = pvData.key_file || "drop.key"
-                    entornoAlt = true
-                }
+                certDir = pvData.cert_file || "drop_test.crt"
+                keyDir = pvData.key_file || "drop.key"
+                entornoAlt = true
+
+                console.log('dataFiscal :>> ', dataFiscal);
                 console.log('newFact.cuit_origen :>> ', newFact.cuit_origen);
                 const afip = new AfipClass(newFact.cuit_origen, certDir, keyDir, entornoAlt);
                 const newDataFiscal = await afip.newFact(dataFiscal);
@@ -69,7 +69,7 @@ export const fiscalMiddle = () => {
                 next()
             }
         } catch (error) {
-            console.error(error)
+            console.log('error :>> ', error);
             next(new Error("Faltan datos o hay datos erroneos, controlelo!"))
         }
     }
