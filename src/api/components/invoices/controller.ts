@@ -264,6 +264,7 @@ export = (injectedStore: typeof StoreType) => {
                     lastInvoice: Number(lastfact.data)
                 }
             } else {
+                console.log('lastfact :>> ', lastfact);
                 throw new Error("Error interno. Probablemente no sea un punto de venta válido.")
             }
         } else {

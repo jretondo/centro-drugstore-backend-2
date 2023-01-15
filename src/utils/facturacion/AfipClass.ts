@@ -94,6 +94,8 @@ export class AfipClass {
         status: resStatus,
         data: number | string
     }> {
+        console.log('pv :>> ', pv);
+        console.log('tipo :>> ', tipo);
         try {
             const ultFact = await this.afip.ElectronicBilling.getLastVoucher(pv, tipo);
             const response = {
