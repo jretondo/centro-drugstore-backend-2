@@ -61,7 +61,7 @@ const devFactMiddle = () => {
             raz_soc_origen: dataFact[0].raz_soc_origen,
             cond_iva_origen: dataFact[0].cond_iva_origen,
             tipo_doc_cliente: dataFact[0].tipo_doc_cliente || 99,
-            n_doc_cliente: dataFact[0].n_doc_cliente || 0,
+            n_doc_cliente: dataFact[0].tipo_doc_cliente === 99 ? 0 : dataFact[0].n_doc_cliente || 0,
             cond_iva_cliente: dataFact[0].cond_iva_cliente,
             email_cliente: dataFact[0].email_cliente || "",
             nota_cred: true,

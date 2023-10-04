@@ -45,27 +45,25 @@ const factuMiddel = () => {
                     cliente_ndoc: body.cliente_ndoc || 0
                 }
             }
+
             let letra = "";
             if (body.fiscal) {
-                if (pvData[0].cond_iva === 1) {
-                    if (body.cond_iva === 1) {
-                        if (pvData[0].fact_m === true) {
-                            body.t_fact = 51
-                            letra = "M"
-                        } else {
-                            body.t_fact = 1
-                            letra = "A"
-                        }
-                    } else {
-                        body.t_fact = 6
+                switch (body.t_fact) {
+                    case 1:
+                        letra = "A"
+                        break;
+                    case 51:
+                        letra = "M"
+                        break;
+                    case 6:
                         letra = "B"
-                    }
-                } else if (pvData[0].cond_iva === 4) {
-                    body.t_fact = 6
-                    letra = "6"
-                } else {
-                    body.t_fact = 11
-                    letra = "C"
+                        break;
+                    case 11:
+                        letra = "C"
+                        break;
+                    default:
+                        letra = "B"
+                        break;
                 }
             } else {
                 body.t_fact = 0
@@ -131,7 +129,7 @@ const factuMiddel = () => {
 
             if (body.fiscal) {
                 ivaList = await listaIva(productsList.listaProd, descuentoPer);
-                console.log('ivaList :>> ', ivaList);
+
                 dataFiscal = {
                     CantReg: 1,
                     PtoVta: pvData[0].pv,
