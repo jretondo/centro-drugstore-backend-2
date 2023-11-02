@@ -48,7 +48,7 @@ const factuMiddel = () => {
 
             let letra = "";
             if (body.fiscal) {
-                switch (body.t_fact) {
+                switch (Number(body.t_fact)) {
                     case 1:
                         letra = "A"
                         break;
