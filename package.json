@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/base-64": "^1.0.0",
     "@types/bcrypt": "^5.0.0",
+    "@types/body-parser": "^1.19.4",
     "@types/cors": "^2.8.12",
     "@types/dotenv": "^6.1.1",
     "@types/ejs": "^3.1.0",
@@ -39,7 +40,9 @@
     "@types/node": "^12.7.8",
     "@types/nodemailer": "^6.4.4",
     "@types/qrcode": "^1.4.2",
+    "@types/qs": "^6.9.9",
     "@types/range-parser": "^1.2.6",
+    "@types/serve-static": "^1.15.4",
     "@types/utf8": "^3.0.1",
     "concurrently": "^6.2.1"
   },
