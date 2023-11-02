@@ -39,6 +39,7 @@
     "@types/node": "^12.7.8",
     "@types/nodemailer": "^6.4.4",
     "@types/qrcode": "^1.4.2",
+    "@types/range-parser": "^1.2.6",
     "@types/utf8": "^3.0.1",
     "concurrently": "^6.2.1"
   },
