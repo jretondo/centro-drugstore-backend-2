@@ -230,52 +230,55 @@ export const invoicePDFMiddle = () => {
             })
 
             jsreport.use(require('jsreport-chrome-pdf')())
-
-            await ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, async (err, data) => {
-                if (err) {
-                    console.log('err', err);
-                    throw new Error("Algo salio mal")
-                }
-
-                const fileName = newFact.letra + " " + pvStr + "-" + nroStr + ".pdf"
-                const filePath = path.join("public", "invoices", fileName)
-                req.body.fileName = fileName
-                req.body.filePath = filePath
-                req.body.formapagoStr = formapagoStr
-
-                const writeFileAsync = promisify(fs.writeFile)
-
-                await jsreport.init()
-
-                await jsreport.render({
-                    template: {
-                        content: data,
-                        name: 'lista',
-                        engine: 'none',
-                        recipe: 'chrome-pdf',
-                        chrome: {
-                            "landscape": false,
-                            "format": "A4",
-                            "scale": 0.8,
-                            displayHeaderFooter: false,
-                            marginBottom: "2cm",
-                            footerTemplate: "",
-                            marginTop: "0.5cm",
-                            headerTemplate: ""
-                        },
-
-                    },
-                })
-                    .then(async (out) => {
-                        await writeFileAsync(filePath, out.content)
-                        await jsreport.close()
-                        next()
-                    })
-                    .catch((e) => {
+            new Promise(async (resolve, reject) => {
+                await ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, async (err, data) => {
+                    if (err) {
                         console.log('err', err);
                         throw new Error("Algo salio mal")
-                    });
+                    }
+
+                    const fileName = newFact.letra + " " + pvStr + "-" + nroStr + ".pdf"
+                    const filePath = path.join("public", "invoices", fileName)
+                    req.body.fileName = fileName
+                    req.body.filePath = filePath
+                    req.body.formapagoStr = formapagoStr
+
+                    const writeFileAsync = promisify(fs.writeFile)
+
+                    await jsreport.init()
+
+                    await jsreport.render({
+                        template: {
+                            content: data,
+                            name: 'lista',
+                            engine: 'none',
+                            recipe: 'chrome-pdf',
+                            chrome: {
+                                "landscape": false,
+                                "format": "A4",
+                                "scale": 0.8,
+                                displayHeaderFooter: false,
+                                marginBottom: "2cm",
+                                footerTemplate: "",
+                                marginTop: "0.5cm",
+                                headerTemplate: ""
+                            },
+
+                        },
+                    })
+                        .then(async (out) => {
+                            await writeFileAsync(filePath, out.content)
+                            await jsreport.close()
+                            resolve(fileName)
+                        })
+                        .catch((e) => {
+                            reject(e)
+                            console.log('err', err);
+                            throw new Error("Algo salio mal")
+                        });
+                })
             })
+            next()
         } catch (error) {
             console.error(error)
             next(new Error("Faltan datos o hay datos erroneos, controlelo!"))
