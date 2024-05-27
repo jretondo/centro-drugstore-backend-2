@@ -254,6 +254,10 @@ async function generatePDF(ejsPath: string, datos2: any, newFact: any, pvStr: st
                 }
             })
 
+            jsreport.use(require('jsreport-chrome-pdf')())
+
+            await jsreport.init()
+
             const out = await jsreport.render({
                 template: {
                     content: data,
