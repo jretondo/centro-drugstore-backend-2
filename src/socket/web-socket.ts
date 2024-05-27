@@ -11,6 +11,7 @@ export class WebSocketServer {
         this.authenticate = authenticate;
 
         this.wss.on('connection', async (ws: WebSocket, req: IncomingMessage) => {
+            console.log('pasa');
             try {
                 const token = req.headers.authorization
                 if (!token) {
