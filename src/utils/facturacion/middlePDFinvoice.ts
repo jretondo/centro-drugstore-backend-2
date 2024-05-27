@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { INewPV } from "interfaces/Irequests"
 import { IDetFactura, IFactura } from "interfaces/Itables"
-import fs from 'fs';
+import fs, { writeFile } from 'fs';
 import path from 'path';
 import QRCode from 'qrcode';
 import utf8 from 'utf8';
@@ -247,7 +247,7 @@ export const invoicePDFMiddle = () => {
 
                     await jsreport.init()
 
-                    await jsreport.render({
+                    jsreport.render({
                         template: {
                             content: data,
                             name: 'lista',
@@ -267,9 +267,16 @@ export const invoicePDFMiddle = () => {
                         },
                     })
                         .then(async (out) => {
-                            await writeFileAsync(filePath, out.content)
-                            await jsreport.close()
-                            resolve(fileName)
+                            writeFile(filePath, out.content, async (err) => {
+                                if (err) {
+                                    console.log('err', err);
+                                    await jsreport.close()
+                                    reject(err)
+                                    throw new Error("Algo salio mal")
+                                }
+                                await jsreport.close()
+                                resolve(fileName)
+                            })
                         })
                         .catch((e) => {
                             reject(e)
