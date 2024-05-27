@@ -278,7 +278,7 @@ async function generatePDF(ejsPath: string, datos2: any, newFact: any, pvStr: st
                 },
             })
 
-            await fs.promises.writeFile(filePath, out.content)
+            await fs.promises.writeFile(filePath, out.content, 'binary')
             resolve(fileName)
         } catch (err) {
             console.error('Error al generar el PDF:', err)
