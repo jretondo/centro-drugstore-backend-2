@@ -98,9 +98,13 @@ export class App {
     }
 
     listenSocketProd(): void {
-        this.server = http.createServer(this.socketApp);
+        const options = {
+            key: fs.readFileSync(path.join(__dirname, "..", "..", "..", "..", "..", "nekoadmin.key"), 'utf8'),
+            cert: fs.readFileSync(path.join(__dirname, "..", "..", "..", "..", "..", "nekoadmin.crt"), 'utf8')
+        };
+        this.server = https.createServer(options, this.socketApp);
         this.webSocketServer = new WebSocketServer(this.server, decodedToken);
         this.server.listen(this.socketApp.get('port'));
-        console.log(`Socket conectado al puerto ${this.socketApp.get('port')} - Desarrollo`);
+        console.log(`Socket conectado al puerto ${this.socketApp.get('port')} - Producción`);
     }
 }
