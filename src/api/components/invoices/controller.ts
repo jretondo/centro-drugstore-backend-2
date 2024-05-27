@@ -18,9 +18,10 @@ import { INewProduct, INewPV } from 'interfaces/Irequests';
 import ControllerStock from '../stock';
 import ControllerClientes from '../clientes';
 import fs from 'fs';
-import { NextFunction } from 'express';
+import { NextFunction, json } from 'express';
 import controller from '../clientes';
 import { zfill } from '../../../utils/cerosIzq';
+import { app } from '../..';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
@@ -388,7 +389,7 @@ export = (injectedStore: typeof StoreType) => {
             fs.unlinkSync(filePath)
         }, 6000);
         const difTime = Number(new Date()) - timer
-        if (difTime > 5000) {
+        if (difTime > 10000) {
             sendAvisoFact(
                 `${newFact.letra} ${zfill(newFact.pv, 5)} - ${zfill(newFact.cbte, 8)}`,
                 newFact.nota_cred,
@@ -405,6 +406,7 @@ export = (injectedStore: typeof StoreType) => {
                 newFact.n_doc_cliente
             )
         }
+
         const dataFact = {
             fileName,
             filePath,
@@ -445,6 +447,20 @@ export = (injectedStore: typeof StoreType) => {
             fs.unlinkSync(filePath)
         }, 6000);
         return dataFact
+    }
+
+    const sendToPrintTicket = async (
+        factId: number
+    ) => {
+        app.webSocketServer?.broadcast(JSON.stringify({ factId, ticket: true }))
+        return factId
+    }
+
+    const sendToPrintFact = async (
+        factId: number
+    ) => {
+        app.webSocketServer?.broadcast(JSON.stringify({ factId, ticket: false }))
+        return factId
     }
 
     const newMovCtaCte = async (body: IMovCtaCte) => {
@@ -504,7 +520,6 @@ export = (injectedStore: typeof StoreType) => {
             const idFact = item.id_fact_asoc
 
             await store.update(Tables.FACTURAS, { id_fact_asoc: idNC }, idFact)
-            console.log('idFact :>> ', idFact);
         })
 
         return {
@@ -543,6 +558,8 @@ export = (injectedStore: typeof StoreType) => {
         correctorNC,
         newMovCtaCte,
         getFormasPago,
-        correctorImg
+        correctorImg,
+        sendToPrintTicket,
+        sendToPrintFact
     }
 }

@@ -1,5 +1,6 @@
 interface IApi {
-    port: any
+    port: any;
+    socketPort: any;
 }
 interface IJwt {
     secret: any
@@ -39,7 +40,8 @@ let config: IConF;
 if (process.env.ENTORNO === "PROD") {
     config = {
         api: {
-            port: process.env.PORT
+            port: process.env.PORT,
+            socketPort: process.env.PORT_SOCKET
         },
         jwt: {
             secret: process.env.SECRET
@@ -67,7 +69,8 @@ if (process.env.ENTORNO === "PROD") {
 } else {
     config = {
         api: {
-            port: process.env.PORT_TEST
+            port: process.env.PORT_TEST,
+            socketPort: process.env.PORT_SOCKET
         },
         jwt: {
             secret: process.env.SECRET

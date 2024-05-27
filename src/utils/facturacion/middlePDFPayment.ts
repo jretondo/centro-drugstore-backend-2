@@ -5,11 +5,12 @@ import fs from 'fs';
 import path from 'path';
 import { Error } from 'tinify/lib/tinify/Error';
 import ejs from 'ejs';
-import pdf from 'html-pdf';
 import { zfill } from "../cerosIzq";
 import moment from "moment";
 import { condFiscalIva } from "./AfipClass";
 import { formatMoney } from "../formatMoney";
+import JsReport from "jsreport-core";
+import { promisify } from "util";
 
 export const paymentPDFMiddle = () => {
     const middleware = async (
@@ -135,19 +136,24 @@ export const paymentPDFMiddle = () => {
 
             const ejsPath = "Recibo.ejs"
 
-            ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, (err, data) => {
+            const jsreport = JsReport({
+                extensions: {
+                    "chrome-pdf": {
+                        "launchOptions": {
+                            "args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
+                            executablePath: "/usr/bin/chromium-browser"
+                        }
+                    }
+                }
+            })
+
+            jsreport.use(require('jsreport-chrome-pdf')())
+
+            ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, async (err, data) => {
                 if (err) {
                     console.log('err', err);
                     throw new Error("Algo salio mal")
                 }
-                let options = {
-                    "height": "16.5in",        // allowed units: mm, cm, in, px
-                    "width": "12in",            // 
-                    "border": {
-                        "right": "0.5cm",
-                        "left": "0.5cm"
-                    },
-                };
 
                 const fileName = newFact.letra + " " + pvStr + "-" + nroStr + ".pdf"
                 const filePath = path.join("public", "invoices", fileName)
@@ -155,13 +161,38 @@ export const paymentPDFMiddle = () => {
                 req.body.filePath = filePath
                 req.body.formapagoStr = formapagoStr
 
-                pdf.create(data, options).toFile(filePath, async function (err, data) {
-                    if (err) {
+                const writeFileAsync = promisify(fs.writeFile)
+
+                await jsreport.init()
+
+                jsreport.render({
+                    template: {
+                        content: data,
+                        name: 'lista',
+                        engine: 'none',
+                        recipe: 'chrome-pdf',
+                        chrome: {
+                            "landscape": false,
+                            "format": "A4",
+                            "scale": 0.8,
+                            displayHeaderFooter: false,
+                            marginBottom: "2cm",
+                            footerTemplate: "",
+                            marginTop: "0.5cm",
+                            headerTemplate: ""
+                        },
+
+                    },
+                })
+                    .then(async (out) => {
+                        await writeFileAsync(filePath, out.content)
+                        await jsreport.close()
+                        next()
+                    })
+                    .catch((e) => {
                         console.log('err', err);
                         throw new Error("Algo salio mal")
-                    }
-                    next()
-                });
+                    });
             })
         } catch (error) {
             console.error(error)

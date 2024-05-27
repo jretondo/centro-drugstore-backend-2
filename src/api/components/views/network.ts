@@ -13,7 +13,6 @@ import { Error } from 'tinify/lib/tinify/Error';
 import moment from 'moment';
 import { file } from '../../../network/response';
 import ejs from 'ejs';
-import pdf from 'html-pdf';
 import JsReport from 'jsreport';
 import { promisify } from 'util';
 
@@ -330,159 +329,6 @@ const newNotaCred = (
             res.render('invoices/FacturaNoFiscal.ejs', datos2);
         }
 
-    })
-}
-
-const downloadFact = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    const factData = {
-        "ver": 1,
-        "fecha": moment(new Date).format("YYYYNNDD"),
-        "cuit": 20185999336,
-        "ptoVta": 3,
-        "tipoCmp": 11,
-        "nroCmp": 5,
-        "importe": 50,
-        "moneda": "PES",
-        "ctz": 0,
-        "tipoDocRec": 96,
-        "nroDocRec": 35092514,
-        "tipoCodAut": "E",
-        "codAut": "72052985659262"
-    }
-
-    function base64_encode(file: any) {
-        // read binary data
-        var bitmap: Buffer = fs.readFileSync(file);
-        // convert binary data to base64 encoded string
-        return Buffer.from(bitmap).toString('base64');
-    }
-
-    const factDataStr = JSON.stringify(factData)
-    var text = factDataStr
-    var bytes = utf8.encode(text);
-    var encoded = base64.encode(bytes);
-    const paraAfip = "https://www.afip.gob.ar/fe/qr/?p=" + encoded
-    let logo64 = base64_encode(path.join("public", "images", "invoices", "logo.png"))
-    let lAfip1 = base64_encode(path.join("public", "images", "invoices", "AFIP1.png"))
-    let lAfip2 = base64_encode(path.join("public", "images", "invoices", "AFIP2.png"))
-
-    QRCode.toDataURL(paraAfip, function (err, url) {
-        if (err) {
-            throw new Error("Algo salio mal")
-        }
-        const myCss = fs.readFileSync(path.join("public", "css", "style.css"), 'utf8')
-
-        const encabezado = {
-            factNro: "00002" + "-" + "00000025",
-            fechaFact: "25/01/2022",
-            letra: "B",
-            codFact: "06",
-        }
-        const ptoVta = {
-            razSocOrigen: "DROP SRL",
-            direccionOrigen: "Obispo Trejo 902, Córdoba",
-            condIvaOrigen: "IVA Responsable Incripto",
-            emailOrigen: "elclubdelalimpieza@gmail.com",
-            cuitOrigen: "30715515322",
-            iibbOrigen: "285918880",
-            iniAct: "04/10/2016",
-        }
-        const cliente = {
-            clienteDireccion: "Av Emilio Olmos 324, Córdoba",
-            clienteEmail: "jretondo90@gmail.com",
-            clienteName: "Retondo Javier",
-            clienteNro: 35092514,
-        }
-        const totales = {
-            subTotal: "500,25",
-            totalIva: "50,00",
-            totalFact: "1.550,25",
-        }
-        const formaPago = {
-            formaPago: "CUENTA CORRIENTE",
-            tipoDoc: "CUIT",
-            condIvaCliente: "IVA RES. INSCRIPTO",
-            saldoCtaCte: "$ 52.652,69",
-            totalDesc: "300,00"
-        }
-        const listaItems = [
-            {
-                alicuota_id: 21,
-                nombre_prod: "Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh",
-                precio_ind: "520,52",
-                cant_prod: 5,
-                total_prod: "520,52",
-                unidad_tipo_prod: 1
-            },
-            {
-                alicuota_id: 21,
-                nombre_prod: "Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh",
-                precio_ind: "520,52",
-                cant_prod: 5,
-                total_prod: "520,52",
-                unidad_tipo_prod: 2
-            },
-            {
-                alicuota_id: 21,
-                nombre_prod: "Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh",
-                precio_ind: "520,52",
-                cant_prod: 5,
-                total_prod: "520,52",
-                unidad_tipo_prod: 0
-            }
-        ]
-
-        //"B 00002-00000025"
-        const cbteAsoc = false
-
-        const foother = {
-            logo: 'data:image/png;base64,' + logo64,
-            logoAfip1: 'data:image/png;base64,' + lAfip1,
-            logoAfip2: 'data:image/png;base64,' + lAfip2,
-            codQR: url,
-            caeNro: 72052985659262,
-            caeVto: "25/01/2022",
-            vendedor: "Alfredo Retondo"
-        }
-
-        const datos2 = {
-            myCss: `<style>${myCss}</style>`,
-            listaItems,
-            cbteAsoc,
-            ...encabezado,
-            ...ptoVta,
-            ...cliente,
-            ...totales,
-            ...formaPago,
-            ...foother,
-        }
-
-        ejs.renderFile(path.join("views", "invoices", "Factura.ejs"), datos2, (err, data) => {
-            if (err) {
-                console.log('err', err);
-                throw new Error("Algo salio mal")
-            }
-            let options = {
-                "height": "16.5in",        // allowed units: mm, cm, in, px
-                "width": "12in",            // 
-                "border": {
-                    "right": "0.5cm",
-                    "left": "0.5cm"
-                },
-            };
-
-            pdf.create(data, options).toFile(path.join("public", "invoices", "B" + " " + "00005" + "-" + "00000025" + ".pdf"), async function (err, data) {
-                if (err) {
-                    console.log('err', err);
-                    throw new Error("Algo salio mal")
-                }
-                file(req, res, path.join("public", "invoices", "B" + " " + "00005" + "-" + "00000025" + ".pdf"), 'application/pdf', "Factura B 00005-00000025.pdf")
-            });
-        })
     })
 }
 
@@ -932,7 +778,8 @@ const cajaListPDF = (
         extensions: {
             "chrome-pdf": {
                 "launchOptions": {
-                    "args": ["--no-sandbox"]
+                    "args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
+                    executablePath: "/usr/bin/chromium-browser"
                 }
             }
         }
@@ -979,7 +826,6 @@ const cajaListPDF = (
 router
     .get("/newUser", newUser)
     .get("/newFact", newFact)
-    .get("/downloadFact", downloadFact)
     .get("/emailfact", vistaEmailFact)
     .get("/cajaListView", listadoCajaView)
     .get("/cajaListPDF", cajaListPDF)

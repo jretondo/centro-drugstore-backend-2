@@ -10,6 +10,7 @@ import { invoicePDFMiddle } from '../../../utils/facturacion/middlePDFinvoice';
 import { sendFactMiddle } from '../../../utils/facturacion/middleSendFact';
 import dataFactMiddle from '../../../utils/facturacion/middleDataFact';
 import devFactMiddle from '../../../utils/facturacion/middleDevFact';
+import { ticketPDFMiddle } from '../../../utils/facturacion/middlePDFTicket';
 
 const list = (
     req: Request,
@@ -98,6 +99,39 @@ const getDataFactPDF = (
             .catch(next)
     }
 };
+
+const sendToPrintTicketReq = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    if (req.query.sendEmail) {
+        success({ req, res })
+    } else {
+        Controller.sendToPrintTicket(Number(req.params.id))
+            .then((data) => {
+                success({ req, res, message: data });
+            })
+            .catch(next)
+    }
+};
+
+const sendToPrintFactReq = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    if (req.query.sendEmail) {
+        success({ req, res })
+    } else {
+        Controller.sendToPrintFact(Number(req.params.id))
+            .then((data) => {
+                success({ req, res, message: data });
+            })
+            .catch(next)
+    }
+};
+
 
 const getFiscalDataInvoice = (
     req: Request,
@@ -218,7 +252,10 @@ const correctorImg = (
 router.get("/details/:id", secure(EPermissions.ventas), get)
     .get("/cajaList/:page", secure(EPermissions.ventas), cajaList)
     .get("/cajaListPDF", secure(EPermissions.ventas), cajaListPDF)
+    .get("/factDataPDF/print/:id", secure(EPermissions.ventas), sendToPrintFactReq)
+    .get("/tktDataPDF/print/:id", secure(EPermissions.ventas), sendToPrintTicketReq)
     .get("/factDataPDF/:id", secure(EPermissions.ventas), dataFactMiddle(), invoicePDFMiddle(), sendFactMiddle(), getDataFactPDF)
+    .get("/tktDataPDF/:id", secure(EPermissions.ventas), dataFactMiddle(), invoicePDFMiddle(), ticketPDFMiddle(), getDataFactPDF)
     .get("/last", secure(EPermissions.ventas), getLast)
     .get("/dummy", secure(EPermissions.ventas), getDummy)
     .get("/timeout", secure(EPermissions.ventas), timeoutProuf)

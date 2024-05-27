@@ -15,7 +15,7 @@ import { formatMoney } from "../formatMoney";
 import JsReport from "jsreport-core";
 import { promisify } from "util";
 
-export const invoicePDFMiddle = () => {
+export const ticketPDFMiddle = () => {
     const middleware = async (
         req: Request,
         res: Response,
@@ -197,7 +197,7 @@ export const invoicePDFMiddle = () => {
                 code: newFact.forma_pago
             }
             const listaItems = productsList
-
+            console.log('listaItems :>> ', listaItems);
             const datos2 = {
                 myCss: `<style>${myCss}</style>`,
                 listaItems,
@@ -213,9 +213,9 @@ export const invoicePDFMiddle = () => {
                 ...footer,
             }
 
-            let ejsPath = "Factura.ejs"
+            let ejsPath = "Facturatkt.ejs"
             if (!newFact.fiscal) {
-                ejsPath = "FacturaNoFiscal.ejs"
+                ejsPath = "FacturaNoFiscaltkt.ejs"
             }
 
             const jsreport = JsReport({
@@ -246,7 +246,7 @@ export const invoicePDFMiddle = () => {
                 const writeFileAsync = promisify(fs.writeFile)
 
                 await jsreport.init()
-                fs.writeFileSync(path.join("public", "invoices", "test.html"), data)
+
                 jsreport.render({
                     template: {
                         content: data,

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Ticket de Factura</title>
+  <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+  <style>
+    body {
+      width: 8cm;
+      margin: 0;
+      padding: 10px;
+      font-family: "Source Sans Pro", Arial, sans-serif;
+      font-size: 12px;
+      color: #000;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    header img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    header h1,
+    header h3,
+    header h2 {
+      margin: 5px 0;
+    }
+
+    .details,
+    .totals,
+    .footer {
+      margin-bottom: 10px;
+    }
+
+    .details .client,
+    .details .invoice {
+      margin-bottom: 5px;
+    }
+
+    .details .client div,
+    .details .invoice div {
+      margin: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th,
+    table td {
+      padding: 3px;
+      text-align: left;
+      border-bottom: 1px solid #000;
+    }
+
+    table th {
+      font-weight: bold;
+      background-color: #f2f2f2;
+    }
+
+    .totals div {
+      text-align: right;
+      margin: 2px 0;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 10px;
+    }
+
+    .footer img {
+      max-width: 50%;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1 style="margin: 0;">FACTURA <%- letra %></h1>
+    <h3 style="margin: 0;">Original Cód.: <%- codFact %></h3>
+    <hr>
+    <h2><%- razSocOrigen %></h2>
+    <div><%- direccionOrigen %></div>
+    <div><%- condIvaOrigen %></div>
+    <div><a href="mailto:<%- emailOrigen %> ">
+        <%- emailOrigen %>
+      </a></div>
+    </div>
+    <hr>
+  </header>
+
+  <div class="details">
+    <div class="client">
+      <% if(clienteNro===99999999){ %>
+        <div>CLIENTE: Consumidor Final</div>
+        <div>DNI: 0</div>
+        <% }else { %>
+          <div>CLIENTE: <%- clienteName %></div>
+          <%- condIvaCliente %>
+            <div><%- tipoDoc %> : <%- clienteNro %></div>
+            <% } %>
+    </div>
+    <div class="invoice">
+      <div>FACTURA Nº: <%- factNro %></div>
+      <div>FECHA: <%- factNro %></div>
+      <div>CUIT: <%- cuitOrigen %></div>
+      <div>IIBB: <%- iibbOrigen %></div>
+      <div>Inicio de act.: <%- iniAct %></div>
+      <% if(cbteAsoc){ %>
+        <div>FACT. ASOCIADA: <%- cbteAsoc %></div>
+        <% }else{ %>
+          <% if(parseInt(formaPago.code)===5){ %>
+            <div>Forma de Pago:</div>
+            <% variosPagos.forEach(function(item){ %>
+              <div class="name">
+                <%- item.tipo_txt %>: $ <%- item.importe %>
+              </div>
+              <% }); %>
+                <% }else{ %>
+                  <div>Forma de Pago:</div>
+                  <div>
+                    <%- formaPago.string %>
+                  </div>
+                  <% } %>
+                    <% } %>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>CANT.</th>
+        <th>DESCRIPCION</th>
+        <th>% IVA</th>
+        <th>$ UN. C/IVA</th>
+        <th>TOTAL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% listaItems.forEach(function(item){ %>
+        <%- include('./ItemFact.ejs', {itemIva: item.alicuota_id, itemName: item.nombre_prod, itemPrice:
+          item.precio_ind, itemCant: item.cant_prod, itemTotal: item.total_prod, tipoUn: item.unidad_tipo_prod}); %>
+          <% }); %>
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <div>SUB-TOTAL: $<%- subTotalNoFiscal %></div>
+    <div>DESC.: $<%- totalDesc %></div>
+    <div>IVA: $<%- totalIva %></div>
+    <div style="font-size: 14px; font-weight: bold;">TOTAL: $<%- totalFact %></div>
+  </div>
+
+  <div class="footer">
+    <div>Vendedor: Javier Retondo</div>
+    <div>CAE: <%- caeNro %></div>
+    <div>VTO CAE: <%- caeVto %></div>
+    <img style="margin: 0;" src="<%- codQR %>" alt="QR Code">
+    <img style="margin: 0;" src="<%- logoAfip1 %>" alt="AFIP Logo 1">
+    <img style="margin: 0;" src="<%- logoAfip2 %>" alt="AFIP Logo 2">
+  </div>
+</body>
+
+</html>

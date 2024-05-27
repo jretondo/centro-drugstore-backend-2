@@ -8,7 +8,7 @@ import StoreType from '../../../store/mysql';
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
-    const upsert = async (body: INewPermissions) => {
+    const upsert = async (body: any) => {
         if (body.permisos.length > 0) {
             await store.remove(Tables.USER_PERMISSIONS, { id_user: body.idUser })
 
@@ -16,7 +16,7 @@ export = (injectedStore: typeof StoreType) => {
 
             const permissions: Promise<Array<Array<number>>> = new Promise((resolve, reject) => {
                 let prov: Array<any> = [];
-                body.permisos.map((item, key) => {
+                body.permisos.map((item: any, key: any) => {
                     prov.push([item.idPermiso, body.idUser]);
                     if (key === body.permisos.length - 1) {
                         resolve(prov);

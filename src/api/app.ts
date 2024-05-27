@@ -4,6 +4,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import https from 'https'
+import http from 'http';
 dotenv.config({
     path: path.join(__dirname, "..", "..", ".env")
 });
@@ -22,12 +23,20 @@ import clientes from './components/clientes/network';
 import stock from './components/stock/network';
 import invoices from './components/invoices/network';
 import reports from './components/reports/network';
+import { WebSocketServer } from '../socket/web-socket';
+import { decodedToken } from '../auth/decodeToken';
+
 export class App {
     app: Application;
+    socketApp: Application;
+    server?: http.Server | https.Server;
+    webSocketServer?: WebSocketServer;
     constructor(
-        private port: number | string
+        private port: number | string,
+        private socketPort: number | string
     ) {
         this.app = express();
+        this.socketApp = express();
         this.settings();
         this.middlewares();
         this.routes();
@@ -35,6 +44,7 @@ export class App {
 
     private settings() {
         this.app.set('port', this.port);
+        this.socketApp.set('port', this.socketPort);
         this.app.set('views', path.join('views'));
         this.app.set('view engine', 'ejs');
     }
@@ -78,5 +88,23 @@ export class App {
         https.createServer(options, this.app).listen(this.app.get('port'), () => {
             console.log(`Conectado al puerto ${this.app.get('port')}`)
         });
+    }
+
+    listenSocketDev(): void {
+        this.server = http.createServer(this.socketApp);
+        this.webSocketServer = new WebSocketServer(this.server, decodedToken);
+        this.server.listen(this.socketApp.get('port'));
+        console.log(`Socket conectado al puerto ${this.socketApp.get('port')} - Desarrollo`);
+    }
+
+    listenSocketProd(): void {
+        const options = {
+            key: fs.readFileSync(path.join(__dirname, "..", "..", "..", "..", "..", "nekoadmin.key"), 'utf8'),
+            cert: fs.readFileSync(path.join(__dirname, "..", "..", "..", "..", "..", "nekoadmin.crt"), 'utf8')
+        };
+        this.server = https.createServer(options, this.socketApp);
+        this.webSocketServer = new WebSocketServer(this.server, decodedToken);
+        this.server.listen(this.socketApp.get('port'));
+        console.log(`Socket conectado al puerto ${this.socketApp.get('port')} - Producción`);
     }
 }

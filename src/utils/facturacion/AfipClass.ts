@@ -112,6 +112,7 @@ export class AfipClass {
         }
     }
     async newFact(data:
+        any |
         FactMonotribProd
         | FactMonotribServ
         | FactMonotribProdNC
@@ -126,6 +127,7 @@ export class AfipClass {
             | FactInscriptoProd
             | FactInscriptoServ
             | string
+            | any
         }> {
         const nfact = await this.lastFact(data.PtoVta, data.CbteTipo);
         if (nfact.status === 200) {
@@ -147,7 +149,7 @@ export class AfipClass {
             return response;
         }
     }
-    async getInvoiceInfo(ncbte: number, pv: number, tipo: CbteTipos): Promise<{
+    async getInvoiceInfo(ncbte: number, pv: number, tipo: CbteTipos | any): Promise<{
         status: resStatus,
         data: FactMonotribProd
         | FactMonotribServ
@@ -193,6 +195,7 @@ export enum CbteTipos {
     "Nota de Débito M" = 52,
     "Nota de Crédito M" = 53,
     "Recibo M" = 54,
+    "cero" = 0
 }
 export enum TiposTributo {
     "Impuestos nacionales" = 1,

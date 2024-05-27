@@ -1,0 +1,20 @@
+<tr>
+  <%- item.cant_prod %>
+    <% if(item.unidad_tipo_prod===0){ %>
+      Un.
+      <% }else if(item.unidad_tipo_prod===1){ %>
+        Kg.
+        <% }else if(item.unidad_tipo_prod===2){ %>
+          Lts.
+          <% } %>
+            <%- item.nombre_prod %>
+              <td>
+                <% item.alicuota_id %>
+              </td>
+              <td>
+                <% item.precio_ind %>
+              </td>
+              <td>
+                <% item.total_prod %>
+              </td>
+</tr>
