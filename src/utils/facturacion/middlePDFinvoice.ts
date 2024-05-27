@@ -231,7 +231,7 @@ export const invoicePDFMiddle = () => {
 
             jsreport.use(require('jsreport-chrome-pdf')())
 
-            ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, async (err, data) => {
+            await ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, async (err, data) => {
                 if (err) {
                     console.log('err', err);
                     throw new Error("Algo salio mal")
@@ -246,8 +246,8 @@ export const invoicePDFMiddle = () => {
                 const writeFileAsync = promisify(fs.writeFile)
 
                 await jsreport.init()
-                fs.writeFileSync(path.join("public", "invoices", "test.html"), data)
-                jsreport.render({
+
+                await jsreport.render({
                     template: {
                         content: data,
                         name: 'lista',

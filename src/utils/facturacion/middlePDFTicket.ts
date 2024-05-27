@@ -231,7 +231,7 @@ export const ticketPDFMiddle = () => {
 
             jsreport.use(require('jsreport-chrome-pdf')())
 
-            ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, async (err, data) => {
+            await ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, async (err, data) => {
                 if (err) {
                     console.log('err', err);
                     throw new Error("Algo salio mal")
@@ -247,7 +247,7 @@ export const ticketPDFMiddle = () => {
 
                 await jsreport.init()
 
-                jsreport.render({
+                await jsreport.render({
                     template: {
                         content: data,
                         name: 'lista',
