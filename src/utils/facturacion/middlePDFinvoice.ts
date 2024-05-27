@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { INewPV } from "interfaces/Irequests"
 import { IDetFactura, IFactura } from "interfaces/Itables"
-import fs, { writeFile } from 'fs';
+import fs from 'fs';
 import path from 'path';
 import QRCode from 'qrcode';
 import utf8 from 'utf8';
@@ -213,10 +213,35 @@ export const invoicePDFMiddle = () => {
                 ...footer,
             }
 
+            const fileName = newFact.letra + " " + pvStr + "-" + nroStr + ".pdf"
+            const filePath = path.join("public", "invoices", fileName)
+            req.body.fileName = fileName
+            req.body.filePath = filePath
+            req.body.formapagoStr = formapagoStr
+
             let ejsPath = "Factura.ejs"
             if (!newFact.fiscal) {
                 ejsPath = "FacturaNoFiscal.ejs"
             }
+
+            const pdf = await generatePDF(ejsPath, datos2, newFact, pvStr, nroStr, formapagoStr)
+
+            next()
+        } catch (error) {
+            console.error(error)
+            next(new Error("Faltan datos o hay datos erroneos, controlelo!"))
+        }
+    }
+    return middleware
+}
+
+async function generatePDF(ejsPath: string, datos2: any, newFact: any, pvStr: string, nroStr: string, formapagoStr: string) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const data: string = await ejs.renderFile(path.join("views", "invoices", ejsPath), datos2)
+            const fileName = newFact.letra + " " + pvStr + "-" + nroStr + ".pdf"
+            const filePath = path.join("public", "invoices", fileName)
+
 
             const jsreport = JsReport({
                 extensions: {
@@ -229,67 +254,31 @@ export const invoicePDFMiddle = () => {
                 }
             })
 
-            jsreport.use(require('jsreport-chrome-pdf')())
-            await new Promise(async (resolve, reject) => {
-                await ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, async (err, data) => {
-                    if (err) {
-                        console.log('err', err);
-                        throw new Error("Algo salio mal")
-                    }
+            const out = await jsreport.render({
+                template: {
+                    content: data,
+                    name: 'lista',
+                    engine: 'none',
+                    recipe: 'chrome-pdf',
+                    chrome: {
+                        "landscape": false,
+                        "format": "A4",
+                        "scale": 0.8,
+                        displayHeaderFooter: false,
+                        marginBottom: "2cm",
+                        footerTemplate: "",
+                        marginTop: "0.5cm",
+                        headerTemplate: ""
+                    },
 
-                    const fileName = newFact.letra + " " + pvStr + "-" + nroStr + ".pdf"
-                    const filePath = path.join("public", "invoices", fileName)
-                    req.body.fileName = fileName
-                    req.body.filePath = filePath
-                    req.body.formapagoStr = formapagoStr
-
-                    const writeFileAsync = promisify(fs.writeFile)
-
-                    await jsreport.init()
-
-                    jsreport.render({
-                        template: {
-                            content: data,
-                            name: 'lista',
-                            engine: 'none',
-                            recipe: 'chrome-pdf',
-                            chrome: {
-                                "landscape": false,
-                                "format": "A4",
-                                "scale": 0.8,
-                                displayHeaderFooter: false,
-                                marginBottom: "2cm",
-                                footerTemplate: "",
-                                marginTop: "0.5cm",
-                                headerTemplate: ""
-                            },
-
-                        },
-                    })
-                        .then(async (out) => {
-                            writeFile(filePath, out.content, async (err) => {
-                                if (err) {
-                                    console.log('err', err);
-                                    await jsreport.close()
-                                    reject(err)
-                                    throw new Error("Algo salio mal")
-                                }
-                                await jsreport.close()
-                                resolve(fileName)
-                            })
-                        })
-                        .catch((e) => {
-                            reject(e)
-                            console.log('err', err);
-                            throw new Error("Algo salio mal")
-                        });
-                })
+                },
             })
-            next()
-        } catch (error) {
-            console.error(error)
-            next(new Error("Faltan datos o hay datos erroneos, controlelo!"))
+
+            await fs.promises.writeFile(filePath, out.content)
+            resolve(fileName)
+        } catch (err) {
+            console.error('Error al generar el PDF:', err)
+            reject(err)
         }
-    }
-    return middleware
+    })
 }
