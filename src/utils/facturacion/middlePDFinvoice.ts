@@ -230,7 +230,7 @@ export const invoicePDFMiddle = () => {
             })
 
             jsreport.use(require('jsreport-chrome-pdf')())
-            new Promise(async (resolve, reject) => {
+            await new Promise(async (resolve, reject) => {
                 await ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, async (err, data) => {
                     if (err) {
                         console.log('err', err);
