@@ -14,6 +14,7 @@ import { CbteTipos, condFiscalIva, FactInscriptoProd, FactInscriptoServ, FactMon
 import { formatMoney } from "../formatMoney";
 import JsReport from "jsreport-core";
 import { promisify } from "util";
+import pdf from 'html-pdf';
 
 export const invoicePDFMiddle = () => {
     const middleware = async (
@@ -223,10 +224,34 @@ export const invoicePDFMiddle = () => {
             if (!newFact.fiscal) {
                 ejsPath = "FacturaNoFiscal.ejs"
             }
+            ejs.renderFile(path.join("views", "invoices", ejsPath), datos2, (err, data) => {
+                if (err) {
+                    console.log('err', err);
+                    throw new Error("Algo salio mal")
+                }
+                let options = {
+                    "height": "16.5in",        // allowed units: mm, cm, in, px
+                    "width": "12in",            // 
+                    "border": {
+                        "right": "0.5cm",
+                        "left": "0.5cm"
+                    },
+                };
 
-            const pdf = await generatePDF(ejsPath, datos2, newFact, pvStr, nroStr, formapagoStr)
+                const fileName = newFact.letra + " " + pvStr + "-" + nroStr + ".pdf"
+                const filePath = path.join("public", "invoices", fileName)
+                req.body.fileName = fileName
+                req.body.filePath = filePath
+                req.body.formapagoStr = formapagoStr
 
-            next()
+                pdf.create(data, options).toFile(filePath, async function (err, data) {
+                    if (err) {
+                        console.log('err', err);
+                        throw new Error("Algo salio mal")
+                    }
+                    next()
+                });
+            })
         } catch (error) {
             console.error(error)
             next(new Error("Faltan datos o hay datos erroneos, controlelo!"))
