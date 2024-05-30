@@ -25,8 +25,6 @@ import reports from './components/reports/network';
 import { WebSocketServer } from '../socket/web-socket';
 import { decodedToken } from '../auth/decodeToken';
 
-const CERT_PATH = '/home/backend/';
-
 export class App {
   app: Application;
   socketApp: Application;
@@ -88,10 +86,10 @@ export class App {
 
   listenProd(): void {
     var options = {
-      key: fs.readFileSync(path.join(CERT_PATH, 'nekoadmin.crt'), 'utf8'),
-      cert: fs.readFileSync(path.join(CERT_PATH, 'nekoadmin.key'), 'utf8'),
+      key: fs.readFileSync(path.join('nekoadmin.crt'), 'utf8'),
+      cert: fs.readFileSync(path.join('nekoadmin.key'), 'utf8'),
     };
-    console.log(' ruta cert', path.join(CERT_PATH, 'nekoadmin.crt'));
+    console.log(' ruta cert', path.join('nekoadmin.crt'));
     https.createServer(options, this.app).listen(this.app.get('port'), () => {
       console.log(`Conectado al puerto ${this.app.get('port')}`);
     });
@@ -108,8 +106,8 @@ export class App {
 
   listenSocketProd(): void {
     const options = {
-      key: fs.readFileSync(path.join(CERT_PATH, 'nekoadmin.crt'), 'utf8'),
-      cert: fs.readFileSync(path.join(CERT_PATH, 'nekoadmin.key'), 'utf8'),
+      key: fs.readFileSync(path.join('nekoadmin.crt'), 'utf8'),
+      cert: fs.readFileSync(path.join('nekoadmin.key'), 'utf8'),
     };
     this.server = https.createServer(options, this.socketApp);
     this.webSocketServer = new WebSocketServer(this.server, decodedToken);
