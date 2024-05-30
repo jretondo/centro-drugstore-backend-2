@@ -91,6 +91,7 @@ export class App {
       key: fs.readFileSync(path.join(CERT_PATH, 'nekoadmin.crt'), 'utf8'),
       cert: fs.readFileSync(path.join(CERT_PATH, 'nekoadmin.key'), 'utf8'),
     };
+    console.log(' ruta cert', path.join(CERT_PATH, 'nekoadmin.crt'));
     https.createServer(options, this.app).listen(this.app.get('port'), () => {
       console.log(`Conectado al puerto ${this.app.get('port')}`);
     });
