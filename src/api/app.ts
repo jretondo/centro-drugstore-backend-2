@@ -86,7 +86,7 @@ export class App {
 
   listenProd(): void {
     var options = {
-      key: fs.readFileSync(path.join('fullchain.key'), 'utf8'),
+      key: fs.readFileSync(path.join('fullchain.pem'), 'utf8'),
       cert: fs.readFileSync(path.join('privkey.pem'), 'utf8'),
     };
     https.createServer(options, this.app).listen(this.app.get('port'), () => {
@@ -105,7 +105,7 @@ export class App {
 
   listenSocketProd(): void {
     const options = {
-      key: fs.readFileSync(path.join('fullchain.key'), 'utf8'),
+      key: fs.readFileSync(path.join('fullchain.pem'), 'utf8'),
       cert: fs.readFileSync(path.join('privkey.pem'), 'utf8'),
     };
     this.server = https.createServer(options, this.socketApp);
