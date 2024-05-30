@@ -16,8 +16,9 @@ services:
       - '3005:3005'
     env_file:
       - .env
-    networks:
-      - centro-drugstore-network
-networks:
-  centro-drugstore-network:
-    driver: bridge
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
+          storage: '6G'
