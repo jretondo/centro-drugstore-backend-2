@@ -5,11 +5,11 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-    working_dir: /usr/src/app
+    working_dir: /app
     volumes:
-      - /home/jretondo/proyectos/centro-drugstore/backend_v1:/usr/src/app
-      - /etc/letsencrypt/live/nekoadmin.com.ar-0002/fullchain.pem:/usr/src/app/fullchain.pem
-      - /etc/letsencrypt/live/nekoadmin.com.ar-0002/privkey.pem:/usr/src/app/privkey.pem
+      - /home/jretondo/proyectos/centro-drugstore/backend_v1:/app
+      - /etc/letsencrypt/live/nekoadmin.com.ar-0002/fullchain.pem:/app/fullchain.pem
+      - /etc/letsencrypt/live/nekoadmin.com.ar-0002/privkey.pem:/app/privkey.pem
       - /usr/src/app/node_modules
     ports:
       - '3003:3003'

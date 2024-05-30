@@ -2,7 +2,7 @@
 FROM node:18
 
 # Establecer el directorio de trabajo
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copiar package.json y package-lock.json para instalar dependencias
 COPY package*.json ./
