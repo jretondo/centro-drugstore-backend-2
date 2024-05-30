@@ -7,24 +7,19 @@ services:
       dockerfile: dockerfile
     working_dir: /usr/src/app
     volumes:
-      - /home/jretondo/proyectos/loza-rufeil/backend_v1:/usr/src/app
+      - /home/jretondo/proyectos/centro-drugstore/backend_v1:/usr/src/app
+      - /etc/letsencrypt/live/nekoadmin.com.ar-0002/fullchain.pem:/usr/src/app/fullchain.pem
+      - /etc/letsencrypt/live/nekoadmin.com.ar-0002/privkey.pem:/usr/src/app/privkey.pem
       - /usr/src/app/node_modules
     ports:
-      - "3003:3003"
+      - '3003:3003'
+      - '3005:3005'
     env_file:
       - .env
     depends_on:
       - redis
     networks:
       - centro-drugstore-network
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-    networks:
-      - centro-drugstore-network
-
 networks:
   centro-drugstore-network:
     driver: bridge

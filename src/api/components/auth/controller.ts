@@ -70,18 +70,22 @@ export = (injectedStore: typeof StoreType) => {
             ...data3[0]
         }
         const prov = data.prov
-        return bcrypt.compare(password, data.pass)
-            .then(same => {
-                if (same) {
-                    return {
-                        token: auth.sign(JSON.stringify(data)),
-                        userData: userData,
-                        provisory: prov
-                    }
-                } else {
-                    throw new Error('información invalida')
-                }
-            })
+        try {
+            const same = await bcrypt.compare(password, data.pass);
+            if (same) {
+                const token = auth.sign(JSON.stringify(data));
+                return {
+                    token: token,
+                    userData: userData,
+                    provisory: prov
+                };
+            } else {
+                throw new Error('información invalida');
+            }
+        } catch (error) {
+            console.error('Error during authentication:', error);
+            throw error; // Re-throw the error to be caught by the calling code
+        }
     }
 
     return {

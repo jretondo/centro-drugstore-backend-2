@@ -1,9 +1,9 @@
 module.exports = {
     apps: [{
-        name: "P3020-loza-rufeil-prod",
+        name: "P3003-center-drugstore-prod",
         script: "dist/api/index.js",
         env: {
-            "PORT": 3020
+          "PORT": 3003
         },
-    }]
+      }]
 }

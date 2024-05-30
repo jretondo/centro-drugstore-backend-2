@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { INewPV } from 'interfaces/Irequests';
-import { IDetFactura, IFactura } from 'interfaces/Itables';
+import {  IFactura } from 'interfaces/Itables';
 import errorSend from '../error';
 import ControllerInvoices from '../../api/components/invoices';
 import ControllerPtoVta from '../../api/components/ptosVta';
-import moment from 'moment';
 
 const dataPaymentMiddle = () => {
     const middleware = async (

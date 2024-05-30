@@ -1,5 +1,5 @@
 # Usar una imagen base oficial de Node.js
-FROM node:18-alpine
+FROM node:18
 
 # Establecer el directorio de trabajo
 WORKDIR /usr/src/app
@@ -8,33 +8,34 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Instalar las dependencias necesarias
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    python3-pip \
     chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
+    chromium-driver \
+    fontconfig \
+    libnss3 \
+    freetype2-demos \
+    libfreetype6 \
+    libharfbuzz-bin \
     ca-certificates \
-    ttf-freefont \
-    fontconfig
-
-# Instalar dependencias de la aplicación
-RUN npm install --production
-
-# Instalar PM2 globalmente
-RUN npm install -g pm2
+    fonts-freefont-ttf \
+    git \
+    wget
 
 # Instalar dependencias globales
-RUN npm install -g typescript jsreport@3.4.0 jsreport-core@2.10.1 jsreport-chrome-pdf@1.10.0 moment@2.29.1
+RUN npm install -g typescript pm2
+
+# Instalar dependencias de la aplicación
+RUN npm install
 
 # Copiar el resto del código fuente
 COPY . .
 
-# Compilar el proyecto TypeScript (si es necesario)
-RUN npm run build
+# Establecer Puppeteer para usar Chromium de la instalación del sistema
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Exponer el puerto que utiliza tu aplicación
-EXPOSE 3000
-
-# Configurar el comando de inicio en producción utilizando PM2
+# Comando por defecto para el contenedor
 CMD ["pm2-runtime", "start", "ecosystem.config.js"]

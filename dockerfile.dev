@@ -1,4 +1,5 @@
-FROM node:16-alpine
+# Usar una imagen base oficial de Node.js
+FROM node:18
 
 # Establecer el directorio de trabajo
 WORKDIR /usr/src/app
@@ -6,33 +7,35 @@ WORKDIR /usr/src/app
 # Copiar package.json y package-lock.json para instalar dependencias
 COPY package*.json ./
 
-RUN apk add --no-cache chromium chromium-chromedriver fontconfig
-
-RUN apk update && apk upgrade && \
-    apk add --no-cache \
+# Instalar las dependencias necesarias
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    python3-pip \
     chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
+    chromium-driver \
+    fontconfig \
+    libnss3 \
+    freetype2-demos \
+    libfreetype6 \
+    libharfbuzz-bin \
     ca-certificates \
-    ttf-freefont \
-    nodejs \
-    npm \
-    yarn \
-    git
+    fonts-freefont-ttf \
+    git \
+    wget
 
-RUN apk update && apk add chromium
-
-# Instala las dependencias necesarias
-RUN npm install -g jsreport@3.4.0 jsreport-core@2.10.1 jsreport-chrome-pdf@1.10.0 moment@2.29.1
-
-# Instalar dependencias
-RUN npm install
+# Instalar dependencias globales
 RUN npm install -g ts-node typescript nodemon
+
+# Instalar dependencias de la aplicación
+RUN npm install
 
 # Copiar el resto del código fuente
 COPY . .
 
+# Establecer Puppeteer para usar Chromium de la instalación del sistema
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 # Comando por defecto para el contenedor
-CMD ["npx","nodemon"]
+CMD ["npx", "nodemon"]
