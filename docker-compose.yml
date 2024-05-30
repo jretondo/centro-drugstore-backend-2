@@ -16,9 +16,3 @@ services:
       - '3005:3005'
     env_file:
       - .env
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: '512M'
-          storage: '6G'
