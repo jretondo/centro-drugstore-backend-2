@@ -7,7 +7,7 @@ services:
       dockerfile: dockerfile
     working_dir: /app
     volumes:
-      - /home/jretondo/proyectos/centro-drugstore/backend_v1:/app
+      - /home/backend/public_html/centro-drugstore/production:/app
       - /etc/letsencrypt/live/nekoadmin.com.ar-0002/fullchain.pem:/app/fullchain.pem
       - /etc/letsencrypt/live/nekoadmin.com.ar-0002/privkey.pem:/app/privkey.pem
       - /usr/src/app/node_modules
