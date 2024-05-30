@@ -29,7 +29,6 @@ RUN npm install -g typescript
 
 # Instalar dependencias de la aplicación
 RUN npm install
-RUN npm run build
 
 # Copiar el resto del código fuente
 COPY . .
@@ -38,5 +37,6 @@ COPY . .
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
+RUN npm run build
 # Comando por defecto para el contenedor
 CMD ["npm","run","start"]
