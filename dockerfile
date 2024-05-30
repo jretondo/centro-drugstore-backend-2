@@ -6,6 +6,7 @@ WORKDIR /usr/src/app
 
 # Copiar package.json y package-lock.json para instalar dependencias
 COPY package*.json ./
+COPY ecosystem.config.js ./
 
 # Instalar las dependencias necesarias
 RUN apt-get update && apt-get install -y \
