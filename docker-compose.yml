@@ -5,6 +5,9 @@ services:
     build:
       context: .
       dockerfile: dockerfile
+    working_dir: /app
+    volumes:
+      - /etc/letsencrypt/live/nekoadmin.com.ar-0002:/etc/letsencrypt/live/nekoadmin.com.ar-0002:ro
     ports:
       - '3003:3003'
       - '3005:3005'
