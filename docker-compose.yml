@@ -5,11 +5,6 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-    working_dir: /app
-    volumes:
-      - /home/backend/public_html/centro-drugstore/production:/app
-      - /etc/letsencrypt/live/nekoadmin.com.ar-0002:/etc/letsencrypt/live/nekoadmin.com.ar-0002:ro
-      - /app/node_modules
     ports:
       - '3003:3003'
       - '3005:3005'
