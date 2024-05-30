@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y \
     wget
 
 # Instalar dependencias globales
-RUN npm install -g typescript
+RUN npm install -g typescript pm2
 
 # Instalar dependencias de la aplicación
 RUN npm install
