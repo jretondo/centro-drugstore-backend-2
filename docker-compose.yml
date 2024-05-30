@@ -10,7 +10,7 @@ services:
       - /home/backend/public_html/centro-drugstore/production:/app
       - /etc/letsencrypt/live/nekoadmin.com.ar-0002/fullchain.pem:/app/fullchain.pem
       - /etc/letsencrypt/live/nekoadmin.com.ar-0002/privkey.pem:/app/privkey.pem
-      - /usr/src/app/node_modules
+      - /app/node_modules
     ports:
       - '3003:3003'
       - '3005:3005'
