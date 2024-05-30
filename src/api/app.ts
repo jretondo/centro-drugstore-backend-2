@@ -25,7 +25,7 @@ import reports from './components/reports/network';
 import { WebSocketServer } from '../socket/web-socket';
 import { decodedToken } from '../auth/decodeToken';
 
-const CERT_PATH = '/etc/letsencrypt/live/nekoadmin.com.ar-0002/';
+const CERT_PATH = '/home/backend/';
 
 export class App {
   app: Application;
@@ -88,8 +88,8 @@ export class App {
 
   listenProd(): void {
     var options = {
-      key: fs.readFileSync(path.join('nekoadmin.crt'), 'utf8'),
-      cert: fs.readFileSync(path.join('nekoadmin.key'), 'utf8'),
+      key: fs.readFileSync(path.join(CERT_PATH, 'nekoadmin.crt'), 'utf8'),
+      cert: fs.readFileSync(path.join(CERT_PATH, 'nekoadmin.key'), 'utf8'),
     };
     https.createServer(options, this.app).listen(this.app.get('port'), () => {
       console.log(`Conectado al puerto ${this.app.get('port')}`);
