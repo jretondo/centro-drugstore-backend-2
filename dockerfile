@@ -6,7 +6,6 @@ WORKDIR /usr/src/app
 
 # Copiar package.json y package-lock.json para instalar dependencias
 COPY package*.json ./
-COPY ecosystem.config.js ./
 
 # Instalar las dependencias necesarias
 RUN apt-get update && apt-get install -y \
@@ -26,10 +25,11 @@ RUN apt-get update && apt-get install -y \
     wget
 
 # Instalar dependencias globales
-RUN npm install -g typescript pm2
+RUN npm install -g typescript
 
 # Instalar dependencias de la aplicación
 RUN npm install
+RUN npm run build
 
 # Copiar el resto del código fuente
 COPY . .
@@ -39,4 +39,4 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Comando por defecto para el contenedor
-CMD ["pm2-runtime", "start", "ecosystem.config.js"]
+CMD ["npm","run","start"]
