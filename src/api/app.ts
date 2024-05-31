@@ -24,6 +24,7 @@ import invoices from './components/invoices/network';
 import reports from './components/reports/network';
 import { WebSocketServer } from '../socket/web-socket';
 import { decodedToken } from '../auth/decodeToken';
+import morgan from 'morgan';
 
 export class App {
   app: Application;
@@ -56,6 +57,7 @@ export class App {
     );
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(morgan('dev'));
   }
 
   private routes() {

@@ -9,6 +9,7 @@ services:
     volumes:
       - /etc/letsencrypt/live/nekoadmin.com.ar-0002/fullchain.pem:/etc/letsencrypt/live/nekoadmin.com.ar-0002/fullchain.pem:ro
       - /etc/letsencrypt/live/nekoadmin.com.ar-0002/privkey.pem:/etc/letsencrypt/live/nekoadmin.com.ar-0002/privkey.pem:ro
+      - ./public:/app/public
     ports:
       - '3003:3003'
       - '3005:3005'
