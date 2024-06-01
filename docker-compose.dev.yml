@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  centro-drugstore-app:
+  centro-drugstore-app-dev:
     image: node-point-sell-dev:1.0
     working_dir: /app
     volumes:
-      - /home/jretondo/proyectos/centro-drugstore/backend_v1:/app
+      - ./:/app
       - /app/node_modules
       - ./public:/app/public
     ports:
