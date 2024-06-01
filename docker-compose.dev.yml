@@ -2,30 +2,14 @@ version: '3.8'
 
 services:
   centro-drugstore-app:
-    build:
-      context: .
-      dockerfile: dockerfile.dev
-    working_dir: /usr/src/app
+    image: node-point-sell-dev:1.0
+    working_dir: /app
     volumes:
-      - /home/jretondo/proyectos/centro-drugstore/backend_v1:/usr/src/app
-      - /usr/src/app/node_modules
+      - /home/jretondo/proyectos/centro-drugstore/backend_v1:/app
+      - /app/node_modules
+      - ./public:/app/public
     ports:
       - '3003:3003'
       - '3005:3005'
     env_file:
       - .env
-    depends_on:
-      - redis
-    networks:
-      - centro-drugstore-network
-
-  redis:
-    image: redis:alpine
-    ports:
-      - '6379:6379'
-    networks:
-      - centro-drugstore-network
-
-networks:
-  centro-drugstore-network:
-    driver: bridge

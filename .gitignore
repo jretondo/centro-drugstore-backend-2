@@ -7,4 +7,3 @@ public
 *.crt
 public
 .vscode
-ecosystem.config.js
