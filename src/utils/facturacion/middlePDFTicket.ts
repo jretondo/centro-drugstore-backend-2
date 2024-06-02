@@ -279,6 +279,12 @@ export const ticketPDFMiddle = () => {
           await page.pdf({
             path: filePath,
             width: '80mm',
+            margin: {
+              top: '5mm',
+              right: '10mm',
+              bottom: '5mm',
+              left: '5mm',
+            },
           });
           await browser.close();
           next();
