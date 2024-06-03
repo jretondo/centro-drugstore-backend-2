@@ -281,9 +281,9 @@ export const ticketPDFMiddle = () => {
             width: '80mm',
             margin: {
               top: '5mm',
-              right: '10mm',
+              right: '15mm',
               bottom: '5mm',
-              left: '5mm',
+              left: '0mm',
             },
           });
           await browser.close();
