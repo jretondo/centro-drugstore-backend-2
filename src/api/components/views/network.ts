@@ -16,500 +16,496 @@ import { promisify } from 'util';
 
 const router = Router();
 
-const newUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+const newUser = async (req: Request, res: Response, next: NextFunction) => {
+  const data: any = await sendPass(
+    'jretondo',
+    'aeaega',
+    'jretondo90@gmail.com',
+    'Nuevo usurio',
+    true,
+    true,
+  );
 
-    const data: any = await sendPass(
-        "jretondo",
-        "aeaega",
-        "jretondo90@gmail.com",
-        "Nuevo usurio",
-        true,
-        true);
+  let url: string;
+  if (process.env.ENTORNO === 'PROD') {
+    url = 'http://nekoadmin.com.ar:3016/images/logo.jpg';
+  } else {
+    url = 'http://localhost:3017/images/logo.jpg';
+  }
 
-    let url: string;
-    if (process.env.ENTORNO === "PROD") {
-        url = "http://nekoadmin.com.ar:3016/images/logo.jpg"
+  const datos: IEmailSendPass = {
+    Colors,
+    Links,
+    Names,
+    titlePage: 'Recuperar Contraseña',
+    titleHead: 'Hola Retondo Javier',
+    parrafosHead: [
+      `Usted es nuevo usuario del sistema de Administración de ${Names[0].productName}`,
+    ],
+    titleButton: 'A continuación le pasamos los datos de ingreso al mismo:',
+    textCall: 'Usuario: jretondo',
+    textCall2: 'Contraseña: zdbzdbzdbzd',
+    textFoother: `Útilice esta información para poder ingresar al sistema: <br> <a href='${Links[0].linkApp}' target='_blank'>Aplicación de Administración</a>`,
+  };
+
+  try {
+    res.render(data, datos);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const newFact = (req: Request, res: Response, next: NextFunction) => {
+  const factData = {
+    ver: 1,
+    fecha: moment(new Date()).format('YYYYNNDD'),
+    cuit: 20185999336,
+    ptoVta: 3,
+    tipoCmp: 11,
+    nroCmp: 5,
+    importe: 50,
+    moneda: 'PES',
+    ctz: 0,
+    tipoDocRec: 96,
+    nroDocRec: 35092514,
+    tipoCodAut: 'E',
+    codAut: '72052985659262',
+  };
+
+  function base64_encode(file: any) {
+    // read binary data
+    var bitmap: Buffer = fs.readFileSync(file);
+    // convert binary data to base64 encoded string
+    return Buffer.from(bitmap).toString('base64');
+  }
+
+  const factDataStr = JSON.stringify(factData);
+  var text = factDataStr;
+  var bytes = utf8.encode(text);
+  var encoded = base64.encode(bytes);
+  const paraAfip = 'https://www.afip.gob.ar/fe/qr/?p=' + encoded;
+  let logo64 = base64_encode(
+    path.join('public', 'images', 'invoices', 'logo.png'),
+  );
+  let lAfip1 = base64_encode(
+    path.join('public', 'images', 'invoices', 'AFIP1.png'),
+  );
+  let lAfip2 = base64_encode(
+    path.join('public', 'images', 'invoices', 'AFIP2.png'),
+  );
+
+  QRCode.toDataURL(paraAfip, function (err, url) {
+    if (err) {
+      throw new Error('Algo salio mal');
+    }
+    const myCss = fs.readFileSync(
+      path.join('public', 'css', 'style.css'),
+      'utf8',
+    );
+
+    const encabezado = {
+      factNro: '00002' + '-' + '00000025',
+      fechaFact: '25/01/2022',
+      letra: 'B',
+      codFact: '06',
+    };
+    const ptoVta = {
+      razSocOrigen: 'DROP SRL',
+      direccionOrigen: 'Obispo Trejo 902, Córdoba',
+      condIvaOrigen: 'IVA Responsable Incripto',
+      emailOrigen: 'elclubdelalimpieza@gmail.com',
+      cuitOrigen: '30715515322',
+      iibbOrigen: '285918880',
+      iniAct: '04/10/2016',
+    };
+    const cliente = {
+      clienteDireccion: 'Av Emilio Olmos 324, Córdoba',
+      clienteEmail: 'jretondo90@gmail.com',
+      clienteName: 'Retondo Javier',
+      clienteNro: 35092514,
+    };
+    const totales = {
+      subTotal: '500,25',
+      totalIva: '50,00',
+      totalFact: '1.550,25',
+      totalDesc: '300,00',
+    };
+    const formaPago = {
+      formaPago: 'CUENTA CORRIENTE',
+      tipoDoc: 'CUIT',
+      condIvaCliente: 'IVA RES. INSCRIPTO',
+      saldoCtaCte: false,
+    };
+    const listaItems = [
+      {
+        alicuota_id: 21,
+        nombre_prod: 'Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh',
+        precio_ind: '520,52',
+        cant_prod: 5,
+        total_prod: '520,52',
+        unidad_tipo_prod: 1,
+      },
+      {
+        alicuota_id: 21,
+        nombre_prod: 'Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh',
+        precio_ind: '520,52',
+        cant_prod: 5,
+        total_prod: '520,52',
+        unidad_tipo_prod: 2,
+      },
+      {
+        alicuota_id: 21,
+        nombre_prod: 'Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh',
+        precio_ind: '520,52',
+        cant_prod: 5,
+        total_prod: '520,52',
+        unidad_tipo_prod: 0,
+      },
+    ];
+
+    const cbteAsoc = false || 'B 00002-00000025';
+
+    const foother = {
+      logo: 'data:image/png;base64,' + logo64,
+      logoAfip1: 'data:image/png;base64,' + lAfip1,
+      logoAfip2: 'data:image/png;base64,' + lAfip2,
+      codQR: url,
+      caeNro: 72052985659262,
+      caeVto: '25/01/2022',
+      vendedor: 'Alfredo Retondo',
+    };
+
+    const datos2 = {
+      myCss: `<style>${myCss}</style>`,
+      listaItems,
+      cbteAsoc,
+      ...encabezado,
+      ...ptoVta,
+      ...cliente,
+      ...totales,
+      ...formaPago,
+      ...foother,
+    };
+    const fiscal = false;
+    if (fiscal) {
+      res.render('invoices/Factura.ejs', datos2);
     } else {
-        url = "http://localhost:3017/images/logo.jpg"
+      res.render('invoices/FacturaNoFiscal.ejs', datos2);
     }
+  });
+};
+const newNotaCred = (req: Request, res: Response, next: NextFunction) => {
+  const factData = {
+    ver: 1,
+    fecha: moment(new Date()).format('YYYYNNDD'),
+    cuit: 20185999336,
+    ptoVta: 3,
+    tipoCmp: 8,
+    nroCmp: 5,
+    importe: 50,
+    moneda: 'PES',
+    ctz: 0,
+    tipoDocRec: 96,
+    nroDocRec: 35092514,
+    tipoCodAut: 'E',
+    codAut: '72052985659262',
+  };
 
-    const datos: IEmailSendPass = {
-        Colors,
-        Links,
-        Names,
-        titlePage: "Recuperar Contraseña",
-        titleHead: "Hola Retondo Javier",
-        parrafosHead: [`Usted es nuevo usuario del sistema de Administración de ${Names[0].productName}`],
-        titleButton: "A continuación le pasamos los datos de ingreso al mismo:",
-        textCall: "Usuario: jretondo",
-        textCall2: "Contraseña: zdbzdbzdbzd",
-        textFoother: `Útilice esta información para poder ingresar al sistema: <br> <a href='${Links[0].linkApp}' target='_blank'>Aplicación de Administración</a>`
+  function base64_encode(file: any) {
+    // read binary data
+    var bitmap: Buffer = fs.readFileSync(file);
+    // convert binary data to base64 encoded string
+    return Buffer.from(bitmap).toString('base64');
+  }
+
+  const factDataStr = JSON.stringify(factData);
+  var text = factDataStr;
+  var bytes = utf8.encode(text);
+  var encoded = base64.encode(bytes);
+  const paraAfip = 'https://www.afip.gob.ar/fe/qr/?p=' + encoded;
+  let logo64 = base64_encode(
+    path.join('public', 'images', 'invoices', 'logo.png'),
+  );
+  let lAfip1 = base64_encode(
+    path.join('public', 'images', 'invoices', 'AFIP1.png'),
+  );
+  let lAfip2 = base64_encode(
+    path.join('public', 'images', 'invoices', 'AFIP2.png'),
+  );
+
+  QRCode.toDataURL(paraAfip, function (err, url) {
+    if (err) {
+      throw new Error('Algo salio mal');
     }
+    const myCss = fs.readFileSync(
+      path.join('public', 'css', 'style.css'),
+      'utf8',
+    );
 
-    try {
-        res.render(data, datos);
-    } catch (error) {
-        next(error)
-    }
-}
+    const encabezado = {
+      factNro: '00002' + '-' + '00000025',
+      fechaFact: '25/02/2022',
+      letra: 'NC B',
+      codFact: '08',
+    };
+    const ptoVta = {
+      razSocOrigen: 'DROP SRL',
+      direccionOrigen: 'Obispo Trejo 902, Córdoba',
+      condIvaOrigen: 'IVA Responsable Incripto',
+      emailOrigen: 'elclubdelalimpieza@gmail.com',
+      cuitOrigen: '30715515322',
+      iibbOrigen: '285918880',
+      iniAct: '04/10/2016',
+    };
+    const cliente = {
+      clienteDireccion: 'Av Emilio Olmos 324, Córdoba',
+      clienteEmail: 'jretondo90@gmail.com',
+      clienteName: 'Retondo Javier',
+      clienteNro: 35092514,
+    };
+    const totales = {
+      subTotal: '500,25',
+      totalIva: '50,00',
+      totalFact: '1.550,25',
+      totalDesc: '300,00',
+    };
+    const formaPago = {
+      formaPago: 'CUENTA CORRIENTE',
+      tipoDoc: 'CUIT',
+      condIvaCliente: 'IVA RES. INSCRIPTO',
+      saldoCtaCte: false,
+    };
+    const listaItems = [
+      {
+        alicuota_id: 21,
+        nombre_prod: 'Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh',
+        precio_ind: '520,52',
+        cant_prod: 5,
+        total_prod: '520,52',
+        unidad_tipo_prod: 1,
+      },
+      {
+        alicuota_id: 21,
+        nombre_prod: 'Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh',
+        precio_ind: '520,52',
+        cant_prod: 5,
+        total_prod: '520,52',
+        unidad_tipo_prod: 2,
+      },
+      {
+        alicuota_id: 21,
+        nombre_prod: 'Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh',
+        precio_ind: '520,52',
+        cant_prod: 5,
+        total_prod: '520,52',
+        unidad_tipo_prod: 0,
+      },
+    ];
 
-const newFact = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+    const cbteAsoc = 'B 00002-00000025';
 
-    const factData = {
-        "ver": 1,
-        "fecha": moment(new Date).format("YYYYNNDD"),
-        "cuit": 20185999336,
-        "ptoVta": 3,
-        "tipoCmp": 11,
-        "nroCmp": 5,
-        "importe": 50,
-        "moneda": "PES",
-        "ctz": 0,
-        "tipoDocRec": 96,
-        "nroDocRec": 35092514,
-        "tipoCodAut": "E",
-        "codAut": "72052985659262"
-    }
+    const foother = {
+      logo: 'data:image/png;base64,' + logo64,
+      logoAfip1: 'data:image/png;base64,' + lAfip1,
+      logoAfip2: 'data:image/png;base64,' + lAfip2,
+      codQR: url,
+      caeNro: 72052985659262,
+      caeVto: '25/01/2022',
+      vendedor: 'Alfredo Retondo',
+    };
 
-    function base64_encode(file: any) {
-        // read binary data
-        var bitmap: Buffer = fs.readFileSync(file);
-        // convert binary data to base64 encoded string
-        return Buffer.from(bitmap).toString('base64');
-    }
-
-    const factDataStr = JSON.stringify(factData)
-    var text = factDataStr
-    var bytes = utf8.encode(text);
-    var encoded = base64.encode(bytes);
-    const paraAfip = "https://www.afip.gob.ar/fe/qr/?p=" + encoded
-    let logo64 = base64_encode(path.join("public", "images", "invoices", "logo.png"))
-    let lAfip1 = base64_encode(path.join("public", "images", "invoices", "AFIP1.png"))
-    let lAfip2 = base64_encode(path.join("public", "images", "invoices", "AFIP2.png"))
-
-    QRCode.toDataURL(paraAfip, function (err, url) {
-        if (err) {
-            throw new Error("Algo salio mal")
-        }
-        const myCss = fs.readFileSync(path.join("public", "css", "style.css"), 'utf8')
-
-        const encabezado = {
-            factNro: "00002" + "-" + "00000025",
-            fechaFact: "25/01/2022",
-            letra: "B",
-            codFact: "06",
-        }
-        const ptoVta = {
-            razSocOrigen: "DROP SRL",
-            direccionOrigen: "Obispo Trejo 902, Córdoba",
-            condIvaOrigen: "IVA Responsable Incripto",
-            emailOrigen: "elclubdelalimpieza@gmail.com",
-            cuitOrigen: "30715515322",
-            iibbOrigen: "285918880",
-            iniAct: "04/10/2016",
-        }
-        const cliente = {
-            clienteDireccion: "Av Emilio Olmos 324, Córdoba",
-            clienteEmail: "jretondo90@gmail.com",
-            clienteName: "Retondo Javier",
-            clienteNro: 35092514,
-        }
-        const totales = {
-            subTotal: "500,25",
-            totalIva: "50,00",
-            totalFact: "1.550,25",
-            totalDesc: "300,00"
-        }
-        const formaPago = {
-            formaPago: "CUENTA CORRIENTE",
-            tipoDoc: "CUIT",
-            condIvaCliente: "IVA RES. INSCRIPTO",
-            saldoCtaCte: "$ 52.652,69" || false,
-        }
-        const listaItems = [
-            {
-                alicuota_id: 21,
-                nombre_prod: "Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh",
-                precio_ind: "520,52",
-                cant_prod: 5,
-                total_prod: "520,52",
-                unidad_tipo_prod: 1
-            },
-            {
-                alicuota_id: 21,
-                nombre_prod: "Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh",
-                precio_ind: "520,52",
-                cant_prod: 5,
-                total_prod: "520,52",
-                unidad_tipo_prod: 2
-            },
-            {
-                alicuota_id: 21,
-                nombre_prod: "Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh",
-                precio_ind: "520,52",
-                cant_prod: 5,
-                total_prod: "520,52",
-                unidad_tipo_prod: 0
-            }
-        ]
-
-        const cbteAsoc = false || "B 00002-00000025"
-
-        const foother = {
-            logo: 'data:image/png;base64,' + logo64,
-            logoAfip1: 'data:image/png;base64,' + lAfip1,
-            logoAfip2: 'data:image/png;base64,' + lAfip2,
-            codQR: url,
-            caeNro: 72052985659262,
-            caeVto: "25/01/2022",
-            vendedor: "Alfredo Retondo"
-        }
-
-        const datos2 = {
-            myCss: `<style>${myCss}</style>`,
-            listaItems,
-            cbteAsoc,
-            ...encabezado,
-            ...ptoVta,
-            ...cliente,
-            ...totales,
-            ...formaPago,
-            ...foother,
-        }
-        const fiscal = false
-        if (fiscal) {
-            res.render('invoices/Factura.ejs', datos2);
-        } else {
-            res.render('invoices/FacturaNoFiscal.ejs', datos2);
-        }
-
-    })
-}
-const newNotaCred = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-
-    const factData = {
-        "ver": 1,
-        "fecha": moment(new Date).format("YYYYNNDD"),
-        "cuit": 20185999336,
-        "ptoVta": 3,
-        "tipoCmp": 8,
-        "nroCmp": 5,
-        "importe": 50,
-        "moneda": "PES",
-        "ctz": 0,
-        "tipoDocRec": 96,
-        "nroDocRec": 35092514,
-        "tipoCodAut": "E",
-        "codAut": "72052985659262"
-    }
-
-    function base64_encode(file: any) {
-        // read binary data
-        var bitmap: Buffer = fs.readFileSync(file);
-        // convert binary data to base64 encoded string
-        return Buffer.from(bitmap).toString('base64');
-    }
-
-    const factDataStr = JSON.stringify(factData)
-    var text = factDataStr
-    var bytes = utf8.encode(text);
-    var encoded = base64.encode(bytes);
-    const paraAfip = "https://www.afip.gob.ar/fe/qr/?p=" + encoded
-    let logo64 = base64_encode(path.join("public", "images", "invoices", "logo.png"))
-    let lAfip1 = base64_encode(path.join("public", "images", "invoices", "AFIP1.png"))
-    let lAfip2 = base64_encode(path.join("public", "images", "invoices", "AFIP2.png"))
-
-    QRCode.toDataURL(paraAfip, function (err, url) {
-        if (err) {
-            throw new Error("Algo salio mal")
-        }
-        const myCss = fs.readFileSync(path.join("public", "css", "style.css"), 'utf8')
-
-        const encabezado = {
-            factNro: "00002" + "-" + "00000025",
-            fechaFact: "25/02/2022",
-            letra: "NC B",
-            codFact: "08",
-        }
-        const ptoVta = {
-            razSocOrigen: "DROP SRL",
-            direccionOrigen: "Obispo Trejo 902, Córdoba",
-            condIvaOrigen: "IVA Responsable Incripto",
-            emailOrigen: "elclubdelalimpieza@gmail.com",
-            cuitOrigen: "30715515322",
-            iibbOrigen: "285918880",
-            iniAct: "04/10/2016",
-        }
-        const cliente = {
-            clienteDireccion: "Av Emilio Olmos 324, Córdoba",
-            clienteEmail: "jretondo90@gmail.com",
-            clienteName: "Retondo Javier",
-            clienteNro: 35092514,
-        }
-        const totales = {
-            subTotal: "500,25",
-            totalIva: "50,00",
-            totalFact: "1.550,25",
-            totalDesc: "300,00"
-        }
-        const formaPago = {
-            formaPago: "CUENTA CORRIENTE",
-            tipoDoc: "CUIT",
-            condIvaCliente: "IVA RES. INSCRIPTO",
-            saldoCtaCte: "$ 52.652,69" || false,
-        }
-        const listaItems = [
-            {
-                alicuota_id: 21,
-                nombre_prod: "Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh",
-                precio_ind: "520,52",
-                cant_prod: 5,
-                total_prod: "520,52",
-                unidad_tipo_prod: 1
-            },
-            {
-                alicuota_id: 21,
-                nombre_prod: "Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh",
-                precio_ind: "520,52",
-                cant_prod: 5,
-                total_prod: "520,52",
-                unidad_tipo_prod: 2
-            },
-            {
-                alicuota_id: 21,
-                nombre_prod: "Prod 1 hdhdf dhd hdfh df hdfhdfh dfhdfh dfh",
-                precio_ind: "520,52",
-                cant_prod: 5,
-                total_prod: "520,52",
-                unidad_tipo_prod: 0
-            }
-        ]
-
-        const cbteAsoc = "B 00002-00000025"
-
-        const foother = {
-            logo: 'data:image/png;base64,' + logo64,
-            logoAfip1: 'data:image/png;base64,' + lAfip1,
-            logoAfip2: 'data:image/png;base64,' + lAfip2,
-            codQR: url,
-            caeNro: 72052985659262,
-            caeVto: "25/01/2022",
-            vendedor: "Alfredo Retondo"
-        }
-
-        const datos2 = {
-            myCss: `<style>${myCss}</style>`,
-            listaItems,
-            cbteAsoc,
-            ...encabezado,
-            ...ptoVta,
-            ...cliente,
-            ...totales,
-            ...formaPago,
-            ...foother,
-        }
-        const fiscal = true
-        if (fiscal) {
-            res.render('invoices/Factura.ejs', datos2);
-        } else {
-            res.render('invoices/FacturaNoFiscal.ejs', datos2);
-        }
-
-    })
-}
-
-const vistaEmailFact = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-
-    let asunto
-    const facturaName = "alfuna"
-    const notaCredito = false
-    const nombre = "Retondo Javier"
-    const tdoc = "CUIT"
-    const ndoc = 20350925148
-    const email = "jretondo90@gmail.com"
-
-
-
-    const attachment = {
-        filename: facturaName,
-        path: path.join('Public', 'Facturas', facturaName)
-    }
-    let informationList
-    let parrafosHead
-    let datos2
-
-
-    if (notaCredito) {
-        asunto = "Compra anulada - Nota de Crédito"
-        informationList = [
-            {
-                col1: 6,
-                title1: "Nombre completo",
-                content1: nombre,
-                col2: 6,
-                title2: tdoc,
-                content2: ndoc
-            },
-            {
-                col1: 12,
-                title1: "Email",
-                content1: email,
-                col2: 6
-            },
-            {
-                col1: 12,
-                title1: "Aclaraciones",
-                content1: "La factura que precede a la presente ha sido anulado a través de una nota de crédito. La misma se encuentrra adjunta al presente email."
-            }
-        ]
-        parrafosHead = [
-            "En el presente email le adjuntamos la nota de crédito de la cancelación de la compra."
-        ]
-
-        datos2 = {
-            Colors,
-            Links,
-            Names,
-            //Particular
-            //Head
-            titlePage: "Confirmar Email",
-            titleHead: "Hola " + nombre,
-            parrafosHead: parrafosHead,
-
-            //InfoForm
-            titleInfoForm: "Sus Datos",
-            informationList: informationList
-        }
-
+    const datos2 = {
+      myCss: `<style>${myCss}</style>`,
+      listaItems,
+      cbteAsoc,
+      ...encabezado,
+      ...ptoVta,
+      ...cliente,
+      ...totales,
+      ...formaPago,
+      ...foother,
+    };
+    const fiscal = true;
+    if (fiscal) {
+      res.render('invoices/Factura.ejs', datos2);
     } else {
-        asunto = "Factura de compra realizada"
-        informationList = [
-            {
-                col1: 6,
-                title1: "Nombre completo",
-                content1: nombre,
-                col2: 6,
-                title2: "Total",
-                content2: "$ 33.050,52"
-            },
-            {
-                col1: 6,
-                title1: tdoc,
-                content1: ndoc,
-                col2: 6,
-                title2: "Forma de Pago",
-                content2: "Efectivo"
-            },
-            {
-                col1: 12,
-                title1: "Email",
-                content1: email,
-            }
-        ]
-
-
-        parrafosHead = [
-            "En el presente email le adjuntamos la factura de su compra."
-        ]
-
-        datos2 = {
-            Colors,
-            Links,
-            Names,
-            //Particular
-            //Head
-            titlePage: "Confirmar Email",
-            titleHead: "Hola " + nombre,
-            parrafosHead: parrafosHead,
-
-            //InfoForm
-            titleInfoForm: "Sus Datos de envío",
-            informationList: informationList
-        }
+      res.render('invoices/FacturaNoFiscal.ejs', datos2);
     }
-    res.render('emails/Templates/FactEmail.ejs', datos2);
-}
+  });
+};
 
-const listadoCajaView = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    function base64_encode(file: any) {
-        // read binary data
-        var bitmap: Buffer = fs.readFileSync(file);
-        // convert binary data to base64 encoded string
-        return Buffer.from(bitmap).toString('base64');
-    }
+const vistaEmailFact = (req: Request, res: Response, next: NextFunction) => {
+  let asunto;
+  const facturaName = 'alfuna';
+  const notaCredito = false;
+  const nombre = 'Retondo Javier';
+  const tdoc = 'CUIT';
+  const ndoc = 20350925148;
+  const email = 'jretondo90@gmail.com';
 
-    const estilo = fs.readFileSync(path.join("views", "reports", "cajaList", "styles.css"), 'utf8')
-    const logo = base64_encode(path.join("public", "images", "invoices", "logo.png"))
+  const attachment = {
+    filename: facturaName,
+    path: path.join('Public', 'Facturas', facturaName),
+  };
+  let informationList;
+  let parrafosHead;
+  let datos2;
 
-    const datos = {
-        logo: 'data:image/png;base64,' + logo,
-        style: "<style>" + estilo + "</style>",
-        ptoVtaStr: "(P.V.: 3) OBISPO TREJO 902 - BARRIO : NUEVA CORDOBA",
-        usuarioStr: "Javier Retondo (jretondo)",
-        desdeStr: "25/01/2022",
-        hastaStr: "20/02/2022",
-        totaleslista: [
-            {
-                tipoStr: "Efectivo",
-                totalStr: "2.520,36"
-            },
-            {
-                tipoStr: "Débito",
-                totalStr: "25.520,36"
-            }
-        ],
-        listaVtas: [
-            {
-                fecha: "20/05/2022",
-                cliente: "Retondo Javier (CUIT: 20350925148)",
-                factura: "X 00004 - 00000015",
-                formaPago: "Efectivo",
-                totalStr: "3.650,65"
-            },
-            {
-                fecha: "20/05/2022",
-                cliente: "Retondo Javier (CUIT: 20350925148)",
-                factura: "X 00004 - 00000015",
-                formaPago: "Efectivo",
-                totalStr: "3.650,65"
-            },
-            {
-                fecha: "20/05/2022",
-                cliente: "Retondo Javier (CUIT: 20350925148)",
-                factura: "X 00004 - 00000015",
-                formaPago: "Efectivo",
-                totalStr: "3.650,65"
-            }
-        ]
-    }
-    res.render('reports/cajaList/index.ejs', datos);
-}
+  if (notaCredito) {
+    asunto = 'Compra anulada - Nota de Crédito';
+    informationList = [
+      {
+        col1: 6,
+        title1: 'Nombre completo',
+        content1: nombre,
+        col2: 6,
+        title2: tdoc,
+        content2: ndoc,
+      },
+      {
+        col1: 12,
+        title1: 'Email',
+        content1: email,
+        col2: 6,
+      },
+      {
+        col1: 12,
+        title1: 'Aclaraciones',
+        content1:
+          'La factura que precede a la presente ha sido anulado a través de una nota de crédito. La misma se encuentrra adjunta al presente email.',
+      },
+    ];
+    parrafosHead = [
+      'En el presente email le adjuntamos la nota de crédito de la cancelación de la compra.',
+    ];
+
+    datos2 = {
+      Colors,
+      Links,
+      Names,
+      //Particular
+      //Head
+      titlePage: 'Confirmar Email',
+      titleHead: 'Hola ' + nombre,
+      parrafosHead: parrafosHead,
+
+      //InfoForm
+      titleInfoForm: 'Sus Datos',
+      informationList: informationList,
+    };
+  } else {
+    asunto = 'Factura de compra realizada';
+    informationList = [
+      {
+        col1: 6,
+        title1: 'Nombre completo',
+        content1: nombre,
+        col2: 6,
+        title2: 'Total',
+        content2: '$ 33.050,52',
+      },
+      {
+        col1: 6,
+        title1: tdoc,
+        content1: ndoc,
+        col2: 6,
+        title2: 'Forma de Pago',
+        content2: 'Efectivo',
+      },
+      {
+        col1: 12,
+        title1: 'Email',
+        content1: email,
+      },
+    ];
+
+    parrafosHead = [
+      'En el presente email le adjuntamos la factura de su compra.',
+    ];
+
+    datos2 = {
+      Colors,
+      Links,
+      Names,
+      //Particular
+      //Head
+      titlePage: 'Confirmar Email',
+      titleHead: 'Hola ' + nombre,
+      parrafosHead: parrafosHead,
+
+      //InfoForm
+      titleInfoForm: 'Sus Datos de envío',
+      informationList: informationList,
+    };
+  }
+  res.render('emails/Templates/FactEmail.ejs', datos2);
+};
+
+const listadoCajaView = (req: Request, res: Response, next: NextFunction) => {
+  function base64_encode(file: any) {
+    // read binary data
+    var bitmap: Buffer = fs.readFileSync(file);
+    // convert binary data to base64 encoded string
+    return Buffer.from(bitmap).toString('base64');
+  }
+
+  const estilo = fs.readFileSync(
+    path.join('views', 'reports', 'cajaList', 'styles.css'),
+    'utf8',
+  );
+  const logo = base64_encode(
+    path.join('public', 'images', 'invoices', 'logo.png'),
+  );
+
+  const datos = {
+    logo: 'data:image/png;base64,' + logo,
+    style: '<style>' + estilo + '</style>',
+    ptoVtaStr: '(P.V.: 3) OBISPO TREJO 902 - BARRIO : NUEVA CORDOBA',
+    usuarioStr: 'Javier Retondo (jretondo)',
+    desdeStr: '25/01/2022',
+    hastaStr: '20/02/2022',
+    totaleslista: [
+      {
+        tipoStr: 'Efectivo',
+        totalStr: '2.520,36',
+      },
+      {
+        tipoStr: 'Débito',
+        totalStr: '25.520,36',
+      },
+    ],
+    listaVtas: [
+      {
+        fecha: '20/05/2022',
+        cliente: 'Retondo Javier (CUIT: 20350925148)',
+        factura: 'X 00004 - 00000015',
+        formaPago: 'Efectivo',
+        totalStr: '3.650,65',
+      },
+      {
+        fecha: '20/05/2022',
+        cliente: 'Retondo Javier (CUIT: 20350925148)',
+        factura: 'X 00004 - 00000015',
+        formaPago: 'Efectivo',
+        totalStr: '3.650,65',
+      },
+      {
+        fecha: '20/05/2022',
+        cliente: 'Retondo Javier (CUIT: 20350925148)',
+        factura: 'X 00004 - 00000015',
+        formaPago: 'Efectivo',
+        totalStr: '3.650,65',
+      },
+    ],
+  };
+  res.render('reports/cajaList/index.ejs', datos);
+};
 
 router
-    .get("/newUser", newUser)
-    .get("/newFact", newFact)
-    .get("/emailfact", vistaEmailFact)
-    .get("/cajaListView", listadoCajaView)
-    .get("/newNotaCred", newNotaCred)
+  .get('/newUser', newUser)
+  .get('/newFact', newFact)
+  .get('/emailfact', vistaEmailFact)
+  .get('/cajaListView', listadoCajaView)
+  .get('/newNotaCred', newNotaCred);
 
 export = router;
