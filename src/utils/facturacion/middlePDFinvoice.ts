@@ -4,8 +4,6 @@ import { IDetFactura, IFactura } from 'interfaces/Itables';
 import fs from 'fs';
 import path from 'path';
 import QRCode from 'qrcode';
-import utf8 from 'utf8';
-import base64 from 'base-64';
 import { Error } from 'tinify/lib/tinify/Error';
 import ejs from 'ejs';
 import { zfill } from '../cerosIzq';
@@ -20,6 +18,7 @@ import {
 } from './AfipClass';
 import { formatMoney } from '../formatMoney';
 import puppeteer from 'puppeteer';
+import { buildFiscalQrUrl } from './qrFiscal';
 
 export const invoicePDFMiddle = () => {
   const middleware = async (
@@ -74,27 +73,7 @@ export const invoicePDFMiddle = () => {
         };
 
         if (newFact.fiscal) {
-          const factData = {
-            ver: 1,
-            fecha: newFact.fecha,
-            cuit: pvData.cuit,
-            ptoVta: pvData.pv,
-            tipoCmp: newFact.t_fact,
-            nroCmp: dataFiscal.CbteDesde,
-            importe: newFact.total_fact,
-            moneda: 'PES',
-            ctz: 0,
-            tipoDocRec: newFact.tipo_doc_cliente,
-            nroDocRec: newFact.n_doc_cliente,
-            tipoCodAut: 'E',
-            codAut: dataFiscal.CAE,
-          };
-
-          const factDataStr = JSON.stringify(factData);
-          var text = factDataStr;
-          var bytes = utf8.encode(text);
-          var encoded = base64.encode(bytes);
-          const paraAfip = 'https://www.afip.gob.ar/fe/qr/?p=' + encoded;
+          const paraAfip = buildFiscalQrUrl(newFact, pvData, dataFiscal);
 
           const lAfip1 = base64_encode(
             path.join('public', 'images', 'invoices', 'AFIP1.png'),
@@ -303,11 +282,11 @@ export const invoicePDFMiddle = () => {
               path: filePath,
               format: 'A4',
               landscape: false,
-              scale: 0.9,
+              scale: 0.92,
               displayHeaderFooter: false,
               margin: {
-                top: '0.5cm',
-                bottom: '2cm',
+                top: '0.3cm',
+                bottom: '0.3cm',
               },
             });
             await browser.close();

@@ -28,6 +28,16 @@ import controller from '../clientes';
 import { zfill } from '../../../utils/cerosIzq';
 import { app } from '../..';
 
+const removeTempFile = (filePath: string) => {
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export = (injectedStore: typeof StoreType) => {
   let store = injectedStore;
 
@@ -547,7 +557,7 @@ export = (injectedStore: typeof StoreType) => {
       return resultInsert.msg.factId;
     } else {
       setTimeout(() => {
-        fs.unlinkSync(filePath);
+        removeTempFile(filePath);
       }, 6000);
       const difTime = Number(new Date()) - timer;
       if (difTime > 10000) {
@@ -621,7 +631,7 @@ export = (injectedStore: typeof StoreType) => {
     };
 
     setTimeout(() => {
-      fs.unlinkSync(filePath);
+      removeTempFile(filePath);
     }, 6000);
     return dataFact;
   };

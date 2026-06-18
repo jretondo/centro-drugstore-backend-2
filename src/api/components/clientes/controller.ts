@@ -10,6 +10,16 @@ import getPages from '../../../utils/getPages';
 import { NextFunction } from 'express';
 import fs from 'fs';
 
+const removeTempFile = (filePath: string) => {
+    try {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
@@ -208,7 +218,7 @@ export = (injectedStore: typeof StoreType) => {
             const resultCtaCte = await store.insert(Tables.CTA_CTE, ctacteData)
 
             setTimeout(() => {
-                fs.unlinkSync(filePath)
+                removeTempFile(filePath)
             }, 6000);
 
             const dataFact = {

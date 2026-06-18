@@ -33,6 +33,15 @@ export const file = (
     fileName: string,
     data?: object
 ) => {
+    if (!fs.existsSync(filePath)) {
+        res.status(404).send({
+            error: true,
+            status: 404,
+            body: "Archivo no encontrado"
+        });
+        return;
+    }
+
     let file = fs.createReadStream(filePath);
     let stat = fs.statSync(filePath);
 
@@ -40,5 +49,15 @@ export const file = (
     res.setHeader('Content-Length', stat.size);
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', 'attachment; filename=' + fileName);
+    file.on('error', (error) => {
+        console.error(error);
+        if (!res.headersSent) {
+            res.status(500).send({
+                error: true,
+                status: 500,
+                body: "No se pudo leer el archivo"
+            });
+        }
+    });
     file.pipe(res);
 };
